@@ -1,0 +1,442 @@
+﻿@page "/panel/users/create"
+@layout PanelLayout
+@inherits BaseComponent
+<PageTitle>ایجاد کاربر</PageTitle>
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="callout callout-danger">
+        <h5><i class="fas fa-exclamation-triangle"></i> خطا</h5>
+        <p>@errorMessage</p>
+    </div>
+}
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="card card-primary card-outline">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-user-plus"></i> ایجاد کاربر جدید
+                </h3>
+                <div class="card-tools">
+                    <button type="button" class="btn btn-tool" @onclick="NavigateToUserList">
+                        <i class="fas fa-arrow-left"></i> بازگشت
+                    </button>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <!-- مراحل -->
+                <ul class="nav nav-pills nav-wizard justify-content-center mb-4">
+                    <li class="nav-item">
+                        <a class="nav-link rounded-pill @(currentStep==1?"active":"completed")" href="#">۱. شخصی</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link rounded-pill @(currentStep==2?"active":(currentStep>2?"completed":""))" href="#">۲. ورود</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link rounded-pill @(currentStep==3?"active":"")" href="#">۳. نقش</a>
+                    </li>
+                </ul>
+
+                <EditForm Model="registerUserDto" OnValidSubmit="HandleSubmit">
+                    <DataAnnotationsValidator />
+
+                    <!-- مرحله ۱ -->
+                    <div class="@(currentStep==1?"":"d-none")">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>نام</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                        </div>
+                                        <input @bind="registerUserDto.FirstName" 
+                                               class="form-control @GetValidationClass("FirstName")" 
+                                               placeholder="نام" />
+                                    </div>
+                                    @if (validationErrors.ContainsKey("FirstName"))
+                                    {
+                                        <small class="form-text text-danger">@validationErrors["FirstName"]</small>
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>نام خانوادگی</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fas fa-user-tag"></i></span>
+                                        </div>
+                                        <input @bind="registerUserDto.LastName" 
+                                               class="form-control @GetValidationClass("LastName")" 
+                                               placeholder="نام خانوادگی" />
+                                    </div>
+                                    @if (validationErrors.ContainsKey("LastName"))
+                                    {
+                                        <small class="form-text text-danger">@validationErrors["LastName"]</small>
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>ایمیل</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                        </div>
+                                        <input type="email" @bind="registerUserDto.Email" 
+                                               class="form-control @GetValidationClass("Email")" 
+                                               placeholder="example@mail.com" />
+                                    </div>
+                                    @if (validationErrors.ContainsKey("Email"))
+                                    {
+                                        <small class="form-text text-danger">@validationErrors["Email"]</small>
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>شغل</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fas fa-briefcase"></i></span>
+                                        </div>
+                                        <input @bind="registerUserDto.JobTitle" 
+                                               class="form-control @GetValidationClass("JobTitle")" 
+                                               placeholder="شغل کاربر" />
+                                    </div>
+                                    @if (validationErrors.ContainsKey("JobTitle"))
+                                    {
+                                        <small class="form-text text-danger">@validationErrors["JobTitle"]</small>
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>کد ملی</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+                                        </div>
+                                        <input @bind="registerUserDto.IdCode" 
+                                               class="form-control @GetValidationClass("IdCode")" 
+                                               placeholder="کد ملی" />
+                                    </div>
+                                    @if (validationErrors.ContainsKey("IdCode"))
+                                    {
+                                        <small class="form-text text-danger">@validationErrors["IdCode"]</small>
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>موبایل</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                                        </div>
+                                        <input @bind="registerUserDto.Phone" class="form-control" placeholder="09xxxxxxxxx" />
+                                    </div>
+                                    @if (validationErrors.ContainsKey("Phone"))
+                                    {
+                                        <small class="form-text text-danger">@validationErrors["Phone"]</small>
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>محل کار</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fas fa-building"></i></span>
+                                        </div>
+                                        <input @bind="registerUserDto.Company" class="form-control" placeholder="محل کار" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-right mt-4">
+                            <button type="button" class="btn btn-flat btn-secondary" @onclick="NavigateToUserList">
+                                انصراف
+                            </button>
+                            <button type="button" class="btn btn-flat btn-primary ml-2" @onclick="NextStep">
+                                بعدی <i class="fas fa-arrow-left ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- مرحله ۲ -->
+                    <div class="@(currentStep==2?"":"d-none")">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>رمز عبور</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                        </div>
+                                        <input type="@(showPassword?"text":"password")" 
+                                               @bind="registerUserDto.Password"
+                                               class="form-control @GetValidationClass("Password")" 
+                                               placeholder="رمز عبور" />
+                                        <div class="input-group-append">
+                                            <button type="button" class="btn btn-outline-secondary" 
+                                                    @onclick="TogglePasswordVisibility" tabindex="-1">
+                                                <i class="fas @(showPassword?"fa-eye-slash":"fa-eye")"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    @if (validationErrors.ContainsKey("Password"))
+                                    {
+                                        <small class="form-text text-danger">@validationErrors["Password"]</small>
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>تکرار رمز عبور</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                        </div>
+                                        <input type="password" @bind="registerUserDto.ConfirmPassword"
+                                               class="form-control @GetValidationClass("ConfirmPassword")" 
+                                               placeholder="تکرار رمز عبور" />
+                                    </div>
+                                    @if (validationErrors.ContainsKey("ConfirmPassword"))
+                                    {
+                                        <small class="form-text text-danger">@validationErrors["ConfirmPassword"]</small>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="callout callout-info">
+                            <h5><i class="fas fa-info"></i> رمز عبور قوی</h5>
+                            <p>رمز باید شامل موارد زیر باشد:</p>
+                            <ul class="mb-0">
+                                <li class="@(ValidPassword.HasUppercase(registerUserDto.Password)?"text-success":"text-muted")">
+                                    <i class="fas fa-check"></i> حداقل یک حرف بزرگ
+                                </li>
+                                <li class="@(ValidPassword.HasLowercase(registerUserDto.Password)?"text-success":"text-muted")">
+                                    <i class="fas fa-check"></i> حداقل یک حرف کوچک
+                                </li>
+                                <li class="@(ValidPassword.HasNumber(registerUserDto.Password)?"text-success":"text-muted")">
+                                    <i class="fas fa-check"></i> حداقل یک عدد
+                                </li>
+                                <li class="@(ValidPassword.HasSpecialChar(registerUserDto.Password)?"text-success":"text-muted")">
+                                    <i class="fas fa-check"></i> حداقل یک کاراکتر خاص
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="text-right mt-4">
+                            <button type="button" class="btn btn-flat btn-secondary" @onclick="PreviousStep">
+                                <i class="fas fa-arrow-right mr-2"></i> قبلی
+                            </button>
+                            <button type="button" class="btn btn-flat btn-primary ml-2" @onclick="NextStep">
+                                بعدی <i class="fas fa-arrow-left ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- مرحله ۳ -->
+                    <div class="@(currentStep==3?"":"d-none")">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>نقش کاربر</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fas fa-shield-alt"></i></span>
+                                        </div>
+                                        <select @bind="registerUserDto.Role" class="form-control">
+                                            @foreach (var r in Enum.GetValues(typeof(UserRole)).Cast<UserRole>())
+                                            {
+                                                <option value="@r">@r.GetDescription()</option>
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>وضعیت اکانت</label>
+                                    <div class="icheck-primary d-inline ml-2">
+                                        <input type="checkbox" id="active" @bind="registerUserDto.IsActive" />
+                                        <label for="active">اکانت فعال باشد</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card card-success mt-4">
+                            <div class="card-header">
+                                <h5 class="card-title"><i class="fas fa-eye"></i> پیش‌نمایش اطلاعات</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-4"><strong>نام کامل:</strong></div>
+                                    <div class="col-8">@registerUserDto.FirstName @registerUserDto.LastName</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-4"><strong>ایمیل:</strong></div>
+                                    <div class="col-8">@registerUserDto.Email</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-4"><strong>شغل:</strong></div>
+                                    <div class="col-8">@registerUserDto.JobTitle</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-4"><strong>نقش:</strong></div>
+                                    <div class="col-8">
+                                        <span class="badge badge-info">@registerUserDto.Role.GetDescription()</span>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-4"><strong>وضعیت:</strong></div>
+                                    <div class="col-8">
+                                        <span class="badge @(registerUserDto.IsActive?"badge-success":"badge-danger")">
+                                            @(registerUserDto.IsActive ? "فعال" : "غیرفعال")
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-right mt-4">
+                            <button type="button" class="btn btn-flat btn-secondary" @onclick="PreviousStep">
+                                <i class="fas fa-arrow-right mr-2"></i> قبلی
+                            </button>
+                            <button type="submit" class="btn btn-success btn-lg ml-3" disabled="@isSubmitting">
+                                @if (isSubmitting)
+                                {
+                                    <i class="fas fa-spinner fa-spin"></i> 
+                                }
+                                else
+                                {
+                                    <i class="fas fa-save"></i>
+                                }
+                            </button>
+                        </div>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+</section>
+
+@if (showSuccessMessage)
+{
+    <div class="callout callout-success position-fixed" style="top:20px;right:20px;z-index:9999;width:350px;">
+        <h5><i class="fas fa-check-circle"></i> موفقیت!</h5>
+        <p>کاربر با موفقیت ایجاد شد.</p>
+        <button type="button" class="close" @onclick="() => showSuccessMessage = false">
+            <span>×</span>
+        </button>
+    </div>
+}
+
+@code {
+    private RegisterUserDto registerUserDto = new() { Role = UserRole.User, IsActive = true };
+    private Dictionary<string, string> validationErrors = new();
+    private bool isSubmitting = false;
+    private bool showSuccessMessage = false;
+    private bool showPassword = false;
+    private int currentStep = 1;
+    private string errorMessage = string.Empty;
+    private string toastType = "danger";
+
+    private async Task HandleSubmit()
+    {
+        if (isSubmitting) return;
+        validationErrors.Clear();
+
+        // اعتبارسنجی نهایی
+        var step1Ok = await Validationstep1();
+        var step2Ok = await Validationstep2();
+        if (!step1Ok || !step2Ok) 
+        {
+            currentStep = step1Ok ? 2 : 1;
+            return;
+        }
+
+        try
+        {
+            isSubmitting = true;
+            var res = await Http.PostAsJsonAsync("api/users/register", registerUserDto);
+            if (res.IsSuccessStatusCode)
+            {
+                showSuccessMessage = true;
+                await Task.Delay(1500);
+                Navigation.NavigateTo("/panel/users");
+            }
+            else
+            {
+                errorMessage = await res.Content.ReadAsStringAsync();
+                toastType = "danger";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "خطا در ارتباط با سرور: " + ex.Message;
+        }
+        finally
+        {
+            isSubmitting = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task<bool> Validationstep1()
+    {
+        bool ok = true;
+        if (string.IsNullOrWhiteSpace(registerUserDto.FirstName)) { validationErrors["FirstName"] = "نام الزامی است"; ok = false; }
+        if (string.IsNullOrWhiteSpace(registerUserDto.LastName)) { validationErrors["LastName"] = "نام خانوادگی الزامی است"; ok = false; }
+        if (string.IsNullOrWhiteSpace(registerUserDto.JobTitle)) { validationErrors["JobTitle"] = "شغل الزامی است"; ok = false; }
+        if (string.IsNullOrWhiteSpace(registerUserDto.IdCode)) { validationErrors["IdCode"] = "کد ملی الزامی است"; ok = false; }
+        else if (!System.Text.RegularExpressions.Regex.IsMatch(registerUserDto.IdCode, @"^\d{10}$")) { validationErrors["IdCode"] = "کد ملی باید ۱۰ رقم باشد"; ok = false; }
+        if (string.IsNullOrWhiteSpace(registerUserDto.Email)) { validationErrors["Email"] = "ایمیل الزامی است"; ok = false; }
+        else if (!Email.IsValidEmail(registerUserDto.Email)) { validationErrors["Email"] = "ایمیل نامعتبر است"; ok = false; }
+        if (!string.IsNullOrWhiteSpace(registerUserDto.Phone) && !Phone.IsValidPhone(registerUserDto.Phone))
+            { validationErrors["Phone"] = "شماره موبایل نامعتبر است"; ok = false; }
+        return ok;
+    }
+
+    private async Task<bool> Validationstep2()
+    {
+        bool ok = true;
+        if (string.IsNullOrWhiteSpace(registerUserDto.Password)) { validationErrors["Password"] = "رمز عبور الزامی است"; ok = false; }
+        else if (!ValidPassword.IsStrongPassword(registerUserDto.Password)) { validationErrors["Password"] = "رمز عبور ضعیف است"; ok = false; }
+        if (registerUserDto.Password != registerUserDto.ConfirmPassword) { validationErrors["ConfirmPassword"] = "رمزها یکسان نیستند"; ok = false; }
+        return ok;
+    }
+
+    private string GetValidationClass(string key) => validationErrors.ContainsKey(key) ? "is-invalid" : "";
+
+    private void TogglePasswordVisibility() => showPassword = !showPassword;
+    private void NavigateToUserList() => Navigation.NavigateTo("/panel/users");
+
+    private async Task NextStep()
+    {
+        bool ok = currentStep == 1 ? await Validationstep1() : await Validationstep2();
+        if (ok && currentStep < 3) currentStep++;
+        else if (!ok) StateHasChanged();
+    }
+
+    private void PreviousStep()
+    {
+        if (currentStep > 1) currentStep--;
+    }
+}

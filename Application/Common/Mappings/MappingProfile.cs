@@ -1,0 +1,20 @@
+﻿using AutoMapper;
+
+using Application.DTOs.User;
+using Domain.Entities.Users;
+using Domain.Entities.Visitors;
+using Application.DTOs.Visitor;
+
+
+namespace Application.Common.Mappings;
+
+public class MappingProfile : Profile
+{
+    public MappingProfile()
+    {
+        CreateMap<User, UserDto>();
+        CreateMap<User, UserListDto>();
+        CreateMap<Visitor, VisitorDto>();
+        CreateMap<Visitor, VisitorVM>(); 
+    }
+}

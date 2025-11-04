@@ -1,0 +1,43 @@
+﻿@inherits LayoutComponentBase
+@inject UserContextService UserContext
+<div class="home-layout">
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-brand">
+                <img src="/images/hotel-logo.png" alt="Hotel Logo" class="logo" />
+                <span class="hotel-name">حراست دانشگاه مازندران</span>
+            </div>
+            <div class="nav-menu">
+                <ul class="nav-links">
+                    <li><a href="/" class="nav-link">Home</a></li>
+                    <li><a href="/rooms" class="nav-link">Rooms</a></li>
+                    <li><a href="/services" class="nav-link">Services</a></li>
+                    <li><a href="/about" class="nav-link">About Us</a></li>
+                    <li><a href="/contact" class="nav-link">Contact</a></li>
+                    <li>@UserContext.Name</li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        @Body
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <p>تیم نرم افزاری دانشگاه مازندران</p>
+        </div>
+    </footer>
+</div>
+@code {
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await UserContext.InitializeAsync();
+        await base.OnInitializedAsync();
+
+    }
+
+}
