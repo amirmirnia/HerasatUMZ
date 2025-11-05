@@ -2,7 +2,7 @@
 @attribute [Authorize(Policy = "AdminOrManagerOrPaymentUser")]
 @inherits BaseComponent
 @layout PanelLayout
-@using Client.Components
+
 
 <PageTitle>داشبورد</PageTitle>
 
@@ -13,47 +13,44 @@
                 <h1>داشبورد</h1>
             </div>
         </div>
-    </div><!-- /.container-fluid -->
+    </div>
 </section>
-<section class="content">
 
+<section class="content">
     <div class="row">
         <div class="col-12 col-sm-6 col-md-3">
             <div class="info-box">
                 <span class="info-box-icon bg-info elevation-1"><i class="fa fa-user"></i></span>
-
                 <div class="info-box-content">
-                    <span class="info-box-text">کل اعضا </span>
-                    <span class="info-box-number">
-                        @overview.TotalUsers
-                    </span>
+                    <span class="info-box-text">کل اعضا</span>
+                    <span class="info-box-number">@overview?.TotalUsers</span>
                 </div>
             </div>
         </div>
+
         <div class="col-12 col-sm-6 col-md-3">
             <div class="info-box mb-3">
                 <span class="info-box-icon bg-danger elevation-1"><i class="fa fa-user"></i></span>
-
                 <div class="info-box-content">
-                    <span class="info-box-text">‌اعضا غیرفعال</span>
-                    <span class="info-box-number">@overview.ActiveUsers</span>
+                    <span class="info-box-text">اعضا غیرفعال</span>
+                    <span class="info-box-number">@overview?.ActiveUsers</span>
                 </div>
             </div>
         </div>
-        <div class="clearfix hidden-md-up"></div>
+
         <div class="col-12 col-sm-6 col-md-3">
             <div class="info-box mb-3">
                 <span class="info-box-icon bg-success elevation-1"><i class="fa fa-user"></i></span>
                 <div class="info-box-content">
                     <span class="info-box-text">کل مراجعین</span>
-                    <span class="info-box-number">0</span>
+                    <span class="info-box-number">@visitLogs?.Items.Count()</span>
                 </div>
             </div>
         </div>
+
         <div class="col-12 col-sm-6 col-md-3">
             <div class="info-box mb-3">
                 <span class="info-box-icon bg-warning elevation-1"><i class="fa fa-users"></i></span>
-
                 <div class="info-box-content">
                     <span class="info-box-text">افراد حاضر</span>
                     <span class="info-box-number">2</span>
@@ -62,113 +59,84 @@
         </div>
     </div>
 
-    <div class="row">
+    <!-- جدول لاگ‌ها -->
+    <div class="row mt-4">
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header border-transparent">
-                    <h3 class="card-title">آخرین سفارشات</h3>
-
-                    <div class="card-tools">
-                        <button type="button" class="btn btn-tool" data-widget="collapse">
-                            <i class="fa fa-minus"></i>
-                        </button>
-                        <button type="button" class="btn btn-tool" data-widget="remove">
-                            <i class="fa fa-times"></i>
-                        </button>
-                    </div>
+                    <h3 class="card-title">لاگ‌های بازدید کاربران</h3>
                 </div>
-                <!-- /.card-header -->
+
                 <div class="card-body p-0">
                     <div class="table-responsive">
                         <table class="table m-0">
                             <thead>
                                 <tr>
-                                    <th>ای دی محصول</th>
-                                    <th>محصول</th>
-                                    <th>وضعیت</th>
-                                    <th>محبوبیت</th>
+                                    <th>نام کاربر</th>
+                                    <th>کد ملی</th>
+                                    <th>IP</th>
+                                    <th>صفحه</th>
+                                    <th>نوع رویداد</th>
+                                    <th>تاریخ</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td><a href="pages/examples/invoice.html">OR9842</a></td>
-                                    <td>بازی ندای وظیفه ۱۰</td>
-                                    <td><span class="badge badge-success">ارسال شده</span></td>
-                                    <td>
-                                        <div class="sparkbar" data-color="#00a65a" data-height="20">90,80,90,-70,61,-83,63</div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><a href="pages/examples/invoice.html">OR1848</a></td>
-                                    <td>تلویزیون هوشمند سامسونگ</td>
-                                    <td><span class="badge badge-warning">در حال پردازش</span></td>
-                                    <td>
-                                        <div class="sparkbar" data-color="#f39c12" data-height="20">90,80,-90,70,61,-83,68</div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><a href="pages/examples/invoice.html">OR7429</a></td>
-                                    <td>آیفون X max</td>
-                                    <td><span class="badge badge-danger">تحویل داده شده</span></td>
-                                    <td>
-                                        <div class="sparkbar" data-color="#f56954" data-height="20">90,-80,90,70,-61,83,63</div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><a href="pages/examples/invoice.html">OR7429</a></td>
-                                    <td>تلویزیون هوشمند سامسونگ</td>
-                                    <td><span class="badge badge-info">در انتظار</span></td>
-                                    <td>
-                                        <div class="sparkbar" data-color="#00c0ef" data-height="20">90,80,-90,70,-61,83,63</div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><a href="pages/examples/invoice.html">OR1848</a></td>
-                                    <td>تلویزیون هوشمند سامسونگ</td>
-                                    <td><span class="badge badge-warning">در حال پردازش</span></td>
-                                    <td>
-                                        <div class="sparkbar" data-color="#f39c12" data-height="20">90,80,-90,70,61,-83,68</div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><a href="pages/examples/invoice.html">OR7429</a></td>
-                                    <td>آیفون X max</td>
-                                    <td><span class="badge badge-danger">تحویل داده شده</span></td>
-                                    <td>
-                                        <div class="sparkbar" data-color="#f56954" data-height="20">90,-80,90,70,-61,83,63</div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><a href="pages/examples/invoice.html">OR9842</a></td>
-                                    <td>بازی ندای وظیفه ۱۰</td>
-                                    <td><span class="badge badge-success">ارسال شده</span></td>
-                                    <td>
-                                        <div class="sparkbar" data-color="#00a65a" data-height="20">90,80,90,-70,61,-83,63</div>
-                                    </td>
-                                </tr>
+                                @if (visitLogs == null)
+                                {
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted">در حال بارگذاری...</td>
+                                    </tr>
+                                }
+                                else if (!visitLogs.Items.Any())
+                                {
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted">هیچ لاگی ثبت نشده است</td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    @foreach (var log in visitLogs.Items)
+                                    {
+                                        <tr>
+                                            <td>@log.UserName</td>
+                                            <td>@log.Codeid</td>
+                                            <td>@log.Ip</td>
+                                            <td>@log.Page</td>
+                                            <td>
+                                                @if (log.EventType == "enter")
+                                                {
+                                                    <span class="badge badge-success">ورود</span>
+                                                }
+                                                else if (log.EventType == "leave")
+                                                {
+                                                    <span class="badge badge-danger">خروج</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge badge-secondary">@log.EventType</span>
+                                                }
+                                            </td>
+                                            <td>@log.Timestamp?.ToLocalTime().ToString("yyyy/MM/dd HH:mm")</td>
+                                        </tr>
+                                    }
+                                }
                             </tbody>
                         </table>
                     </div>
-                    <!-- /.table-responsive -->
                 </div>
-                <!-- /.card-body -->
-                <div class="card-footer clearfix">
-                    <a href="javascript:void(0)" class="btn btn-sm btn-info float-left">سفارش جدید</a>
-                    <a href="javascript:void(0)" class="btn btn-sm btn-secondary float-right">مشاهده همه سفار</a>
-                </div>
-                <!-- /.card-footer -->
             </div>
         </div>
     </div>
 </section>
 
-
 @code {
     private DashboardOverview? overview;
+    private PagedResult<VisitLogResponseDto>? visitLogs;
 
     protected override async Task OnInitializedAsync()
     {
         overview = await Http.GetFromJsonAsync<DashboardOverview>("api/dashboard/overview");
+        visitLogs =await Logger.GetAllLogAsync();
 
     }
 }

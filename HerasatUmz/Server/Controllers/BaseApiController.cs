@@ -41,17 +41,17 @@ public abstract class BaseApiController : ControllerBase
                "Anonymous";
     }
 
-    protected string GetCurrentUserEmail()
+    protected string GetCurrentFullName()
     {
-        return User.FindFirst("email")?.Value ??
-               User.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress")?.Value ??
+        return User.FindFirst("Name")?.Value ??
+               User.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name")?.Value ??
                string.Empty;
     }
 
     protected string GetCurrentUserRole()
     {
         return User.FindFirst("role")?.Value ??
-               User.FindFirst("http://schemas.microsoft.com/ws/2008/06/identity/claims/role")?.Value ??
+               User.FindFirst("http://schemas.microsoft.com/ws/2008/06/identity/claims/Role")?.Value ??
                "User";
     }
 }

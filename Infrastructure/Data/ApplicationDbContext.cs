@@ -4,6 +4,7 @@ using Application.Common.Interfaces;
 using Domain.Entities.Users;
 using Infrastructure.Data.Configurations;
 using Domain.Entities.Visitors;
+using Domain.Entities.Log;
 
 
 namespace Infrastructure.Data;
@@ -19,6 +20,8 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
     }
 
     public DbSet<User> Users => Set<User>();
+    public DbSet<VisitLog> visitLogs => Set<VisitLog>();
+
     public DbSet<Visitor> Visitors => Set<Visitor>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

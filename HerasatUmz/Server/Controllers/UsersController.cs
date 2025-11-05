@@ -82,10 +82,11 @@ public class UsersController : BaseApiController
         [FromQuery] string? selectedCompany = null,
         [FromQuery] UserRole? selectedRole = null)
     {
+
         var isAuth = User.Identity?.IsAuthenticated;  // آیا True است؟
         var roles = User.Claims.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value);
-        var userId = User.FindFirstValue(ClaimTypes.Name);
-        var roled = User.FindFirstValue(ClaimTypes.Role);
+        var userId = GetCurrentFullName();
+        var roled = GetCurrentUserRole();
         try
         {
             var query = new GetAllUsersQuery

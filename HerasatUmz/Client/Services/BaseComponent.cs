@@ -1,4 +1,5 @@
 ﻿using Blazored.LocalStorage;
+using Client.Services.Interface;
 using Domain.Enum;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -17,7 +18,7 @@ namespace Client.Services
         [Inject] protected ILocalStorageService _localStorage { get; set; } = default!;
         [Inject] protected AuthenticationStateProvider AuthStateProvider { get; set; } = default!;
         [Inject] protected UserContextService UserContext { get; set; } = default!;
-
+        [Inject] protected IVisitLogger Logger { get; set; } = default!;
 
         public ToastType toastType = ToastType.Warning;
 
