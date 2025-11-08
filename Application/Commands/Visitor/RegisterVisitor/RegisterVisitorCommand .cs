@@ -14,5 +14,6 @@ namespace Application.Commands.Visitor.RegisterVisitor
         public string NationalCode { get; set; } = string.Empty;
         public string HostName { get; set; } = string.Empty;
         public string? PhoneNumber { get; set; }
+        public string? PhotoBase64 { get; set; }
     }
 }

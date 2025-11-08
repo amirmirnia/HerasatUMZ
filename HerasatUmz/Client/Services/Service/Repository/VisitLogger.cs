@@ -42,12 +42,12 @@ namespace Client.Services.Repository
            
         }
 
-        public async Task<PagedResult<VisitLogResponseDto>> GetAllLogAsync()
+        public async Task<PagedResult<VisitLogResponseDto>> GetAllLogAsync(int? pageNumber, int? pageSize)
         {
             var visitLogs=new PagedResult<VisitLogResponseDto>();
             try
             {
-                visitLogs = await http.GetFromJsonAsync<PagedResult<VisitLogResponseDto>>("api/visit");
+                visitLogs = await http.GetFromJsonAsync<PagedResult<VisitLogResponseDto>>($"api/visit?pageNumber={pageNumber} & pageSize={pageSize}");
             }
             catch
             {

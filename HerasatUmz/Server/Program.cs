@@ -23,7 +23,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddHttpClient();
 builder.Services.AddSignalR();
-
+builder.Services.AddSingleton<IWebHostEnvironment>(builder.Environment);
 // Add HttpContextAccessor
 builder.Services.AddHttpContextAccessor();
 

@@ -11,6 +11,15 @@
     <Toast Message="@errorMessage" Type="toastType" Duration="5000" />
 }
 
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>افراد خارج شده از دانشگاه</h1>
+            </div>
+        </div>
+    </div>
+</section>
 <div class="row">
     <div class="col-12">
         <!-- فیلتر و جستجو -->
@@ -320,9 +329,10 @@
         // SignalR خودش حذف می‌کند
     }
 
-    private string GetVisitorImage(string? base64)
+
+    private string GetVisitorImage(string? imagename)
     {
-        if (string.IsNullOrEmpty(base64)) return "/images/default-avatar.png";
-        return $"data:image/jpeg;base64,{base64}";
+        if (!string.IsNullOrEmpty(imagename)) return $"/uploads/visitors/{imagename}";
+        return $"/";
     }
 }

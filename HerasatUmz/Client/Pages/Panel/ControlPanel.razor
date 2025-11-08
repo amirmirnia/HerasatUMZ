@@ -20,7 +20,7 @@
     <div class="row">
         <div class="col-12 col-sm-6 col-md-3">
             <div class="info-box">
-                <span class="info-box-icon bg-info elevation-1"><i class="fa fa-user"></i></span>
+                <span class="info-box-icon bg-info elevation-1"><i class="fa fa-users"></i></span>
                 <div class="info-box-content">
                     <span class="info-box-text">کل اعضا</span>
                     <span class="info-box-number">@overview?.TotalUsers</span>
@@ -30,7 +30,7 @@
 
         <div class="col-12 col-sm-6 col-md-3">
             <div class="info-box mb-3">
-                <span class="info-box-icon bg-danger elevation-1"><i class="fa fa-user"></i></span>
+                <span class="info-box-icon bg-danger elevation-1"><i class="fa fa-user-secret"></i></span>
                 <div class="info-box-content">
                     <span class="info-box-text">اعضا غیرفعال</span>
                     <span class="info-box-number">@overview?.ActiveUsers</span>
@@ -40,7 +40,7 @@
 
         <div class="col-12 col-sm-6 col-md-3">
             <div class="info-box mb-3">
-                <span class="info-box-icon bg-success elevation-1"><i class="fa fa-user"></i></span>
+                <span class="info-box-icon bg-success elevation-1"><i class="fa fa-sign-in"></i></span>
                 <div class="info-box-content">
                     <span class="info-box-text">کل مراجعین</span>
                     <span class="info-box-number">@visitLogs?.Items.Count()</span>
@@ -50,7 +50,7 @@
 
         <div class="col-12 col-sm-6 col-md-3">
             <div class="info-box mb-3">
-                <span class="info-box-icon bg-warning elevation-1"><i class="fa fa-users"></i></span>
+                <span class="info-box-icon bg-warning elevation-1"><i class="fa fa-location-arrow"></i></span>
                 <div class="info-box-content">
                     <span class="info-box-text">افراد حاضر</span>
                     <span class="info-box-number">2</span>
@@ -136,7 +136,7 @@
     protected override async Task OnInitializedAsync()
     {
         overview = await Http.GetFromJsonAsync<DashboardOverview>("api/dashboard/overview");
-        visitLogs =await Logger.GetAllLogAsync();
+        visitLogs =await Logger.GetAllLogAsync(null,null);
 
     }
 }

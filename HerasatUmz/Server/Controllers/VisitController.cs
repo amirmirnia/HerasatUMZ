@@ -49,8 +49,8 @@ namespace Server.Controllers
         [HttpGet]
         public async Task<IActionResult> Get(
              [FromQuery] string searchQuery = null,
-         [FromQuery] int pageNumber = 1,
-        [FromQuery] int pageSize = 10)
+         [FromQuery] int? pageNumber = 1,
+        [FromQuery] int? pageSize = 10)
         {
             var command = new GetVisitLogsQuery()
             {

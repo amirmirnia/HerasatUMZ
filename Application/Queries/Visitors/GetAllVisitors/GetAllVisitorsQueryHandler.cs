@@ -14,5 +14,6 @@ namespace Application.Queries.Visitors.GetAllVisitors
         public string searchQuery { get; set; }
         public DateTime? EnterTime { get; set; }
         public DateTime? ExitTime { get; set; }
+        public string? PhotoPath { get; set; }
     }
 }

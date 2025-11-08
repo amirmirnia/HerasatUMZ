@@ -2219,3 +2219,12 @@ table {
         transform: translateY(0);
     }
 }
+.webcam-container {
+    position: relative;
+    display: inline-block;
+}
+
+    .webcam-container video {
+        border: 2px solid #007bff;
+        border-radius: 8px;
+    }
