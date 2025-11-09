@@ -21,6 +21,10 @@ public class DeleteUserCommandHandler : IRequestHandler<DeleteUserCommand, bool>
         var user = await _context.Users
             .FirstOrDefaultAsync(u => u.Id == request.Id, cancellationToken);
 
+        if (user.Role == UserRole.Admin)
+        {
+            throw new InvalidOperationException("please Go to Home");
+        }
         if (user == null)
         {
             throw new NotFoundException(nameof(User), request.Id);

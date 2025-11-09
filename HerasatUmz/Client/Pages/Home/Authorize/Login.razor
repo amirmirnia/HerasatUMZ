@@ -19,7 +19,7 @@
                 <p class="login-box-msg">حراست دانشگاه مازندران</p>
                 @if (!string.IsNullOrEmpty(errorMessage))
                 {
-                     <p class="login-box-msg">@errorMessage</p>
+                    <p class="login-box-msg">@errorMessage</p>
                 }
                 <form action="../../index2.html" method="post">
                     <div class="input-group mb-3">
@@ -51,11 +51,11 @@
 
     <script>
         $(function () {
-          $('input').iCheck({
-            checkboxClass: 'icheckbox_square-blue',
-            radioClass   : 'iradio_square-blue',
-            increaseArea : '20%' // optional
-          })
+        $('input').iCheck({
+        checkboxClass: 'icheckbox_square-blue',
+        radioClass   : 'iradio_square-blue',
+        increaseArea : '20%' // optional
+        })
         })
     </script>
 </body>
@@ -66,6 +66,18 @@
     private string password = "";
     private string errorMessage = "";
     private bool isLoading = false;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        if (authState.User.Identity?.IsAuthenticated == true)
+        {
+            Navigation.NavigateTo($"/Panel",true);
+            
+        }
+
+    }
 
     private async Task LoginAsync()
     {

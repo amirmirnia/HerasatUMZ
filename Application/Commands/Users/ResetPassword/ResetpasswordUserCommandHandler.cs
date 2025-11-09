@@ -8,6 +8,7 @@ using Domain.Entities.Users;
 using System.Security.Cryptography;
 using System.Text;
 using Application.Commands.Users.DeleteUser;
+using Domain.Enum;
 
 namespace Application.Commands.Users.RegisterUser;
 
@@ -36,6 +37,10 @@ public class ResetpasswordUserCommandHandler : IRequestHandler<ResetpasswordUser
         var existingUser = await _context.Users
             .FirstOrDefaultAsync(u => u.IdCode == request.IdCode, cancellationToken);
 
+        if (existingUser.Role == UserRole.Admin)
+        {
+            throw new InvalidOperationException("please Go to Home");
+        }
         if (existingUser == null)
         {
             throw new InvalidOperationException("چنین کاربری ثبت شده است");

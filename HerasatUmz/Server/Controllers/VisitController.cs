@@ -2,6 +2,7 @@
 using Application.DTOs.Log;
 using Application.Queries.Log.GetAllLog;
 using Domain.Entities.Log;
+using Domain.Enum;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;

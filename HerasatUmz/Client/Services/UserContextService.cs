@@ -40,7 +40,7 @@ namespace Client.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error fetching user details: {ex.Message}");
+              
             }
         }
 

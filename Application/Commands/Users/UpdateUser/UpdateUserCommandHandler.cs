@@ -5,6 +5,7 @@ using Application.Common.Exceptions;
 using Application.DTOs.User;
 using AutoMapper;
 using Domain.Entities.Users;
+using Domain.Enum;
 
 namespace Application.Commands.Users.UpdateUser;
 
@@ -24,6 +25,10 @@ public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, UserD
         var user = await _context.Users
             .FirstOrDefaultAsync(u => u.Id == request.Id, cancellationToken);
 
+        if (user.Role==UserRole.Admin)
+        {
+            throw new InvalidOperationException("please Go to Home");
+        }
         if (user == null)
         {
             throw new NotFoundException(nameof(User), request.Id);

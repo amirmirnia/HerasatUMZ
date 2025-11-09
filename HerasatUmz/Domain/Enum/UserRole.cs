@@ -10,7 +10,7 @@ public enum UserRole
     Manager = 2,
     [Description("کاربر")]
     User = 3,
-    [Description("مالی")]
-    PaymentUser = 4
+
+
 
 }

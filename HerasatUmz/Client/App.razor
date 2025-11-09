@@ -1,23 +1,21 @@
-﻿@using Client.Pages.Home.Authorize
-@using Microsoft.AspNetCore.Components.Authorization
-@using Microsoft.AspNetCore.Authorization
-@using Client.Pages
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Routing
 
 <CascadingAuthenticationState>
     <Router AppAssembly="@typeof(App).Assembly">
         <Found Context="routeData">
             <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
                 <NotAuthorized>
-                    @* <RedirectToLogin /> *@
+                    <RedirectToLogin />
                 </NotAuthorized>
             </AuthorizeRouteView>
             <FocusOnNavigate RouteData="@routeData" Selector="h1" />
         </Found>
         <NotFound>
-            <PageTitle>Not found</PageTitle>
             <LayoutView Layout="@typeof(MainLayout)">
                 <p role="alert">صفحه‌ای با این آدرس وجود ندارد.</p>
             </LayoutView>
         </NotFound>
     </Router>
 </CascadingAuthenticationState>
+

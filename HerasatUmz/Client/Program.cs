@@ -33,8 +33,8 @@ builder.Services.AddAuthorizationCore(options =>
     options.AddPolicy("AdminOrManager", policy =>
     policy.RequireClaim("role", nameof(UserRole.Admin), nameof(UserRole.Manager)));
 
-    options.AddPolicy("AdminOrManagerOrPaymentUser", policy =>
-policy.RequireClaim("role", nameof(UserRole.Admin), nameof(UserRole.Manager), nameof(UserRole.PaymentUser)));
+    options.AddPolicy("AdminOrManagerOrUser", policy =>
+policy.RequireClaim("role", nameof(UserRole.Admin), nameof(UserRole.Manager), nameof(UserRole.User)));
 
 });
 

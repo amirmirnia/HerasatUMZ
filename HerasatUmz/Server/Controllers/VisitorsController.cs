@@ -13,7 +13,7 @@ namespace Server.Controllers;
 
 
 [Route("api/[controller]")]
-[Authorize(Roles = $"{nameof(UserRole.Admin)}, {nameof(UserRole.Manager)}")]
+[Authorize]
 public class VisitorsController : BaseApiController
 {
     private readonly IHubContext<VisitorHub> _hubContext;

@@ -1,5 +1,5 @@
 ﻿@page "/panel/visitors/ListExitedVisitors"
-@using Client.Components
+@attribute [Authorize]
 @layout PanelLayout
 @inherits BaseComponent
 <PageTitle>ملاقات‌کنندگان خارج شده</PageTitle>
@@ -94,7 +94,7 @@
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">
-                    <i class="fas fa-users"></i> ملاقات‌کنندگان حاضر در دانشگاه
+                    <i class="fas fa-users"></i> ملاقات‌کنندگان خارج شده از دانشگاه
                 </h3>
             </div>
             <div class="card-body table-responsive p-0">
@@ -121,7 +121,8 @@
                                 <th>کد ملی</th>
                                 <th>ملاقات‌شونده</th>
                                 <th>شماره تماس</th>
-                                <th>زمان ورود</th>
+                                <th>زمان ورود</th>.
+                                <th>زمان خروج</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -139,6 +140,7 @@
                                     <td>@v.HostName</td>
                                     <td dir="ltr">@v.PhoneNumber</td>
                                     <td>@v.RegisterDateTime.ToPeString("yyyy/MM/dd - HH:mm")</td>
+                                    <td>@v.ExitDateTime?.ToPeString("yyyy/MM/dd - HH:mm")</td>
 
                                 </tr>
                             }

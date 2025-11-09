@@ -119,14 +119,6 @@ public class UsersController : BaseApiController
     {
         try
         {
-            // Check if user can access this profile (self or admin/manager)
-            //var currentUserRole = GetCurrentUserRole();
-            //var currentUserId = GetCurrentUserId();
-            
-            //if (currentUserRole != "Admin" && currentUserRole != "Manager" && currentUserId != id.ToString())
-            //{
-            //    return Forbid();
-            //}
 
             var user = await Mediator.Send(new GetUserByIdQuery(id));
             return HandleResult(user);
@@ -202,6 +194,8 @@ public class UsersController : BaseApiController
     [ProducesResponseType(400)]
     public async Task<ActionResult> DeleteUser(int id)
     {
+        var currentUserId = GetCurrentUserId();
+        var currentUserRole = GetCurrentUserRole();
         try
         {
             var result = await Mediator.Send(new DeleteUserCommand { Id = id });

@@ -1,4 +1,5 @@
 ﻿@page "/panel/users/create"
+@attribute [Authorize(Policy = "AdminOrManager")]
 @layout PanelLayout
 @inherits BaseComponent
 <PageTitle>ایجاد کاربر</PageTitle>
@@ -174,7 +175,7 @@
                         </div>
 
                         <div class="text-right mt-4">
-                            <button type="button" class="btn btn-block btn-outline-primary btn-lg" @onclick="NavigateToUserList">
+                            <button type="button" class="btn  btn-outline-primary btn-lg" @onclick="NavigateToUserList">
                                 انصراف
                             </button>
                             <button type="button" class="btn btn-flat btn-primary ml-2" @onclick="NextStep">
@@ -250,7 +251,7 @@
                         </div>
 
                         <div class="text-right mt-4">
-                            <button type="button" class="btn btn-block btn-outline-primary btn-lg" @onclick="PreviousStep">
+                            <button type="button" class="btn  btn-outline-primary btn-lg" @onclick="PreviousStep">
                                 <i class="fas fa-arrow-right mr-2"></i> قبلی
                             </button>
                             <button type="button" class="btn btn-flat btn-primary ml-2" @onclick="NextStep">
@@ -325,7 +326,7 @@
                         </div>
 
                         <div class="text-right mt-4">
-                            <button type="button" class="btn btn-block btn-outline-primary btn-lg" @onclick="PreviousStep">
+                            <button type="button" class="btn  btn-outline-primary btn-lg" @onclick="PreviousStep">
                                 <i class="fas fa-arrow-right mr-2"></i> قبلی
                             </button>
                             <button type="submit" class="btn btn-success btn-lg ml-3" disabled="@isSubmitting">

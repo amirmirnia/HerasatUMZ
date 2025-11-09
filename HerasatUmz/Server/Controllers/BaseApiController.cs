@@ -51,7 +51,7 @@ public abstract class BaseApiController : ControllerBase
     protected string GetCurrentUserRole()
     {
         return User.FindFirst("role")?.Value ??
-               User.FindFirst("http://schemas.microsoft.com/ws/2008/06/identity/claims/Role")?.Value ??
+               User.FindFirst("http://schemas.microsoft.com/ws/2008/06/identity/claims/role")?.Value ??
                "User";
     }
 }

@@ -8,7 +8,7 @@ namespace Server.Controllers;
 
 
 [Route("api/[controller]")]
-[Authorize(Roles = $"{nameof(UserRole.Admin)}, {nameof(UserRole.Manager)}, {nameof(UserRole.PaymentUser)}")]
+[Authorize]
 public class DashboardController : BaseApiController
 {
 

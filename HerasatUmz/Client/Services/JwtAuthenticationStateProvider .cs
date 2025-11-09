@@ -46,6 +46,12 @@ namespace Client.Services
                 return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
             }
         }
+
+        public void NotifyUserLogout()
+        {
+            var anonymous = new ClaimsPrincipal(new ClaimsIdentity());
+            NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(anonymous)));
+        }
     }
 
 }

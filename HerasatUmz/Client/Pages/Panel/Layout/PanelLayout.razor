@@ -3,10 +3,12 @@
 @inject NavigationManager Navigation
 @inject HttpClient Http
 @inject UserContextService UserContext
-
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthStateProvider
 
 <body class="hold-transition sidebar-mini">
     <div class="wrapper">
+        <!-- Navbar -->
         <nav class="main-header navbar navbar-expand bg-white navbar-light border-bottom">
             <ul class="navbar-nav">
                 <li class="nav-item">
@@ -15,36 +17,41 @@
                 <li class="nav-item d-none d-sm-inline-block">
                     <a href="/Panel" class="nav-link">خانه</a>
                 </li>
+                <li class="nav-item d-none d-sm-inline-block">
+                    <a @onclick="LogOut" class="nav-link">خروج</a>
+                </li>
             </ul>
         </nav>
 
-
+        <!-- Sidebar -->
         <aside class="main-sidebar sidebar-dark-primary elevation-4">
-            <!-- Brand Logo -->
             <a href="/panel" class="brand-link">
                 <span class="brand-text font-weight-light">برنامه مدیریت دیدبان</span>
             </a>
+
             <div class="sidebar">
-                <div>
-                    <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-                        <div class="image">
-                            <img src="/LogoWhite.png" class="img-circle elevation-2" alt="User Image">
-                        </div>
-                        <div class="info">
-                            <a  class="d-block">@UserContext.Name</a>
-                        </div>
+                <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+                    <div class="image">
+                        <img src="/LogoWhite.png" class="img-circle elevation-2" alt="User Image">
                     </div>
+                    <div class="info">
+                        <a class="d-block">@UserContext.Name</a>
+                    </div>
+                </div>
 
-                    <!-- Sidebar Menu -->
+                <nav class="mt-2">
+                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
 
-                    <nav class="mt-2">
-                        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-                            <li class="nav-item">
-                                <a href="/panel/users" class="nav-link">
-                                    <i class="nav-icon fa fa-dashboard"></i>
-                                    <p>داشبورد</p>
-                                </a>
-                            </li>
+                        <!-- داشبورد - همه می‌بینند -->
+                        <li class="nav-item">
+                            <a href="/panel/users" class="nav-link">
+                                <i class="nav-icon fa fa-dashboard"></i>
+                                <p>داشبورد</p>
+                            </a>
+                        </li>
+
+                        <!-- فقط Admin/Manager -->
+                        <AuthorizeView Policy="AdminOrManager">
                             <li class="nav-item">
                                 <a href="/panel/users" class="nav-link">
                                     <i class="nav-icon fa fa-users"></i>
@@ -63,147 +70,66 @@
                                     <p>لاگ برنامه</p>
                                 </a>
                             </li>
+                        </AuthorizeView>
+
+                        <!-- مانیتورینگ - همه می‌بینند -->
+                        <li class="nav-item">
+                            <a href="/Panel/visitors" class="nav-link">
+                                <i class="nav-icon fa fa-th"></i>
+                                <p>مانیتورینگ</p>
+                            </a>
+                        </li>
+
+                        <!-- فقط Admin/Manager -->
+                        <AuthorizeView Policy="AdminOrManager">
                             <li class="nav-item">
-                                <a href="/Panel/visitors" class="nav-link active">
-                                    <i class="nav-icon fa fa-th"></i>
-                                    <p>
-                                        مانیتورینگ
-                                    </p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="/panel/visitors/create" class="nav-link active">
+                                <a href="/panel/visitors/create" class="nav-link">
                                     <i class="nav-icon fa fa-plus-square-o"></i>
-                                    <p>
-                                        ثبت ملاقاتی
-                                    </p>
+                                    <p>ثبت ملاقاتی</p>
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <a href="/Panel/visitors/ListExitedVisitors" class="nav-link">
-                                    <i class="fa fa-sign-out"></i>
-                                    <p>لیست افراد خارج شده</p>
-                                </a>
-                            </li>
-                            
-                        </ul>
-                    </nav>
-                    <!-- /.sidebar-menu -->
-                </div>
+                        </AuthorizeView>
+
+                        <!-- لیست افراد خارج شده - همه می‌بینند -->
+                        <li class="nav-item">
+                            <a href="/Panel/visitors/ListExitedVisitors" class="nav-link">
+                                <i class="fa fa-sign-out"></i>
+                                <p>لیست افراد خارج شده</p>
+                            </a>
+                        </li>
+
+                    </ul>
+                </nav>
             </div>
-            <!-- /.sidebar -->
         </aside>
+
+        <!-- Content -->
         <div class="content-wrapper">
             @Body
         </div>
+
+        <!-- Footer -->
         <footer class="main-footer">
             <strong>تیم نرم افزاری مرکز فناوری اطلاعات-پشتیبانی:امیرحسین میرنیا 2889</strong>
         </footer>
-
-        <!-- Control Sidebar -->
-        <aside class="control-sidebar control-sidebar-dark">
-        </aside>
     </div>
 </body>
 
 @code {
-    private bool sidebarCollapsed = false;
-    private bool isDarkMode = false;
-    private bool showUserDropdown = false;
-    private bool showNotifications = false;
-    private bool financeMenuOpen = false;
-    private bool isMobile = false;
-    private string searchQuery = "";
-    private string userAvatar = "";
-    private Application.DTOs.User.UserDto? currentUser;
-    private int pendingCount = 3;
-    private int notificationCount = 2;
-
     protected override async Task OnInitializedAsync()
     {
         await UserContext.InitializeAsync();
         await base.OnInitializedAsync();
-        CheckIfMobile();
-        LoadUserPreferences();
         StateHasChanged();
-
-        _ = Task.Run(async () =>
-        {
-            while (true)
-            {
-                await Task.Delay(30000);
-                await InvokeAsync(StateHasChanged);
-            }
-        });
     }
 
-    private void CheckIfMobile()
+    private async Task LogOut()
     {
-        isMobile = false;
-        if (isMobile)
+        try
         {
-            sidebarCollapsed = true;
+            await Http.PostAsync("api/auth/logout", null);
         }
-    }
-
-    private void LoadUserPreferences()
-    {
-        isDarkMode = false;
-    }
-
-
-
-    private void ToggleSidebar()
-    {
-        sidebarCollapsed = !sidebarCollapsed;
-    }
-
-    private void CloseSidebar()
-    {
-        if (isMobile)
-        {
-            sidebarCollapsed = true;
-        }
-    }
-
-
-
-
-    private void ToggleDarkMode()
-    {
-        isDarkMode = !isDarkMode;
-    }
-
-
-
-
-
-    private void ToggleFinanceMenu()
-    {
-        financeMenuOpen = !financeMenuOpen;
-    }
-
-
-
-    private string GetActiveClass(string path)
-    {
-        var currentPath = new Uri(Navigation.Uri).AbsolutePath;
-        if (path == "/panel" && currentPath == "/panel")
-        {
-            return "active";
-        }
-        if (path != "/panel" && currentPath.StartsWith(path, StringComparison.OrdinalIgnoreCase))
-        {
-            return "active";
-        }
-        return "";
-    }
-
-
-    private async Task Logout()
-    {
-        await Http.GetAsync("api/auth/Logout");
-        Navigation.NavigateTo("/login");
-
+        catch { /* ignore */ }
+        Navigation.NavigateTo("/");
     }
 }

@@ -26,7 +26,7 @@ namespace Client.Services
 
         protected readonly string hubUrl = "https://localhost:7224/hubs/visitors";
         protected readonly string baseUrl = "https://localhost:7224";
-
+        protected AuthenticationState authState { get; set; }
         private string? role;
         private string? name;
         private string? idCode;
@@ -41,6 +41,8 @@ namespace Client.Services
 
         protected override async Task OnInitializedAsync()
         {
+            authState = await AuthStateProvider.GetAuthenticationStateAsync(); // Fixed here
+            
             await UserContext.InitializeAsync();
             await InitHubAsync();
             await base.OnInitializedAsync();

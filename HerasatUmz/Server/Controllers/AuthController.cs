@@ -91,11 +91,13 @@ namespace Server.Controllers
             return Ok();
         }
 
-        [HttpGet("logout")]
-        public IActionResult Logout()
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
         {
+
             Response.Cookies.Delete("access_token");
             Response.Cookies.Delete("refresh_token");
+
             return Ok();
         }
     }
