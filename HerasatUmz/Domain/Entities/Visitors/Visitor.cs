@@ -1,4 +1,5 @@
 ﻿using Domain.Common;
+using Domain.Entities.Vehicles;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -19,6 +20,8 @@ namespace Domain.Entities.Visitors
         public string? PhoneNumber { get; set; }
         public string? PhotoPath { get; set; }
         public bool IsInside { get; set; } = true;
-        public DateTime? ExitDateTime { get; set; } 
+        public DateTime? ExitDateTime { get; set; }
+
+        public virtual Vehicle Vehicles { get; set; } = new Vehicle();
     }
 }

@@ -5,6 +5,7 @@ using Domain.Entities.Users;
 using Infrastructure.Data.Configurations;
 using Domain.Entities.Visitors;
 using Domain.Entities.Log;
+using Domain.Entities.Vehicles;
 
 
 namespace Infrastructure.Data;
@@ -23,6 +24,7 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
     public DbSet<VisitLog> visitLogs => Set<VisitLog>();
 
     public DbSet<Visitor> Visitors => Set<Visitor>();
+    public DbSet<Vehicle> Vehicles => Set<Vehicle>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
