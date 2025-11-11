@@ -1,0 +1,197 @@
+﻿.license-plate {
+    width: 420px;
+    height: 110px;
+    background: white;
+    border: 2px solid #000;
+    border-radius: 12px;
+    display: flex;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    overflow: hidden;
+    z-index: 100000;
+    position: fixed;
+}
+
+.left-section {
+    width: 90px;
+    background: #0032a0;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-right: 2px solid #000;
+}
+
+.flag {
+    width: 60px;
+    height: 36px;
+    background: linear-gradient(to bottom, #009b3a 0%, #009b3a 33%, white 33%, white 66%, #da000c 66%, #da000c 100%);
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+}
+
+    .flag::before {
+        /*content: "الله";*/
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(-15deg);
+        font-size: 12px;
+        color: #da000c;
+        font-weight: bold;
+    }
+
+.country {
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+    .country span {
+        display: block;
+        text-align: center;
+    }
+
+.main-section {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    position: relative;
+    border-left: 2px solid;
+}
+
+.numbers {
+    display: flex;
+    gap: 8px;
+    font-size: 52px;
+    font-weight: bold;
+    color: #000;
+    direction: ltr;
+}
+
+    .numbers .digit {
+        text-align: center;
+    }
+
+    .numbers .letter {
+        font-size: 48px;
+    }
+
+.right-section {
+    width: 90px;
+    background: white;
+    border-left: 2px solid #000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+}
+
+.code {
+    font-size: 28px;
+    font-weight: bold;
+    color: #000;
+}
+.plate-tooltip {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+}
+
+    .plate-tooltip .tooltiptext {
+        visibility: hidden;
+        background-color: #333;
+        text-align: center;
+        border-radius: 6px;
+        padding: 8px;
+        position: absolute;
+        z-index: 1000;
+        bottom: 125%; /* بالای آیکون */
+        left: 50%;
+        margin-left: -60px;
+        width: 180px;
+        opacity: 0;
+        transition: opacity 0.3s;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        pointer-events: none; /* برای جلوگیری از تداخل ماوس */
+    }
+
+        .plate-tooltip .tooltiptext::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #333 transparent transparent transparent;
+        }
+
+    .plate-tooltip:hover .tooltiptext {
+        visibility: visible;
+        opacity: 1;
+    }
+
+
+    /*Modal*/
+/* Blazor Modal - بدون جاوا اسکریپت */
+.blazor-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1050;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.blazor-modal-dialog {
+    width: 90%;
+    max-width: 800px;
+    animation: zoomIn 0.3s ease-out;
+}
+
+.btn-close-white {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: white;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0 10px;
+}
+
+    .btn-close-white:hover {
+        opacity: 0.8;
+    }
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes zoomIn {
+    from {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}

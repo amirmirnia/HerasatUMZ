@@ -6,22 +6,23 @@
 <PageTitle>ملاقات‌کنندگان حاضر</PageTitle>
 
 <ConfirmModal @ref="confirmModal" OnClose="HandleConfirmResult" />
-
-@if (!string.IsNullOrEmpty(errorMessage))
+<ImageModal @ref="imageModal" OnClose="() => StateHasChanged()" />
+    
+    @if (!string.IsNullOrEmpty(errorMessage))
 {
     <Toast Message="@errorMessage" Type="toastType" Duration="5000" />
 }
 
 
-        <section class="content-header">
-            <div class="container-fluid">
-                <div class="row mb-2">
-                    <div class="col-sm-6">
-                        <h1>افراد حاضر در دانشگاه</h1>
-                    </div>
-                </div>
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>افراد حاضر در دانشگاه</h1>
             </div>
-        </section>
+        </div>
+    </div>
+</section>
 
 
 <div class="row">
@@ -85,6 +86,7 @@
                                 <th>عکس</th>
                                 <th>نام کامل</th>
                                 <th>کد ملی</th>
+                                <th>پلاک</th>
                                 <th>ملاقات‌شونده</th>
                                 <th>شماره تماس</th>
                                 <th>زمان ورود</th>
@@ -103,12 +105,43 @@
                                     </td>
                                     <td><strong>@v.FullName</strong></td>
                                     <td>@v.NationalCode</td>
+                                    <td>
+                                        @{
+                                            if (!string.IsNullOrEmpty(v.Vehicles.PlatePart1))
+                                            {
+                                                <div class="plate-tooltip">
+                                                    <i class="fas fa-car text-primary"></i>
+                                                    <span class="tooltiptext">
+                                                        <Plate Part1="@v.Vehicles.PlatePart1"
+                                                               Letter="@v.Vehicles.PlateLetter.GetDescription()"
+                                                               Part3="@v.Vehicles.PlatePart3"
+                                                               Part4="@v.Vehicles.PlatePart4" />
+                                                    </span>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">بدون وسیله</span>
+                                            }
+                                        }
+                                    </td>
+                                    <td>@v.NationalCode</td>
                                     <td>@v.HostName</td>
                                     <td dir="ltr">@v.PhoneNumber</td>
                                     <td>@v.RegisterDateTime.ToPeString("yyyy/MM/dd - HH:mm")</td>
                                     <td>
-                                        <button class="btn btn-danger btn-sm"
-                                        @onclick="() => ConfirmExit(v.Id, v.FullName)">
+                                        @{
+                                            if (!string.IsNullOrEmpty(v.Vehicles.PlatePart1))
+                                            {
+                                                <button class="btn btn-info btn-sm"
+                                                        @onclick="() => ShowVehicleImage(v.Vehicles.VehiclePhotoPath)"
+                                                        title="نمایش عکس پلاک">
+                                                    <i class="fas fa-image"></i> نمایش
+                                                </button>
+                                            }
+                                        }
+                                        <button class="btn btn-danger btn-sm ml-1"
+                                                @onclick="() => ConfirmExit(v.Id, v.FullName)">
                                             <i class="fas fa-sign-out-alt"></i> خروج
                                         </button>
                                     </td>
@@ -127,6 +160,7 @@
     private ConfirmModal? confirmModal;
     private int pendingVisitorId;
     private string pendingVisitorName = "";
+    private ImageModal? imageModal;
     private string searchQuery = "";
     private string MiladiCheckIn = "";
     private string MiladiCheckOut = "";
@@ -231,5 +265,14 @@
     {
         if (!string.IsNullOrEmpty(imagename)) return $"/uploads/visitors/{imagename}";
         return $"/";
+    }
+
+    private void ShowVehicleImage(string? imagename)
+    {
+        var url = !string.IsNullOrEmpty(imagename)
+            ? $"/uploads/Vehiclevisitors/{imagename}"
+            : null;
+
+        imageModal?.Show(url);
     }
 }

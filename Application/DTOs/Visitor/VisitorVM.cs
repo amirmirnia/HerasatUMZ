@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Application.DTOs.Vehicle;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -19,5 +20,7 @@ namespace Application.DTOs.Visitor
         public string? PhotoPath { get; set; }
         public bool IsInside { get; set; } = true;
         public DateTime? ExitDateTime { get; set; }
+
+        public VehicleDto Vehicles { get; set; }
     }
 }

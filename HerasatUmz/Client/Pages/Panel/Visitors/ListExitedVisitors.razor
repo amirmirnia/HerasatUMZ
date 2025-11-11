@@ -2,9 +2,11 @@
 @attribute [Authorize]
 @layout PanelLayout
 @inherits BaseComponent
+
 <PageTitle>ملاقات‌کنندگان خارج شده</PageTitle>
 
 <ConfirmModal @ref="confirmModal" OnClose="HandleConfirmResult" />
+<ImageModal @ref="imageModal" OnClose="() => StateHasChanged()" />
 
 @if (!string.IsNullOrEmpty(errorMessage))
 {
@@ -42,7 +44,7 @@
                                     <span class="input-group-text"><i class="fas fa-search"></i></span>
                                 </div>
                                 <input type="text" class="form-control" placeholder="نام، کد ملی یا ملاقات‌شونده..."
-                                       @bind="searchQuery" @bind:event="oninput" @bind:after="LoadVisitors" />
+                                @bind="searchQuery" @bind:event="oninput" @bind:after="LoadVisitors" />
                             </div>
                         </div>
                     </div>
@@ -55,13 +57,13 @@
                                     <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
                                 </div>
                                 <input id="checkIn"
-                                       type="text"
-                                       class="form-control"
-                                       data-jdp
-                                       data-jdp-miladi-input="miladi_dateS"
-                                       placeholder="انتخاب تاریخ ورود"
-                                       autocomplete="off"
-                                       @onchange="UpdateCheckInDate" />
+                                type="text"
+                                class="form-control"
+                                data-jdp
+                                data-jdp-miladi-input="miladi_dateS"
+                                placeholder="انتخاب تاریخ ورود"
+                                autocomplete="off"
+                                @onchange="UpdateCheckInDate" />
                                 <input id="miladi_dateS" type="hidden" @bind="MiladiCheckIn" />
                             </div>
                         </div>
@@ -75,13 +77,13 @@
                                     <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
                                 </div>
                                 <input id="checkOut"
-                                       type="text"
-                                       class="form-control"
-                                       data-jdp
-                                       data-jdp-miladi-input="miladi_dateE"
-                                       placeholder="شمسی"
-                                       autocomplete="off"
-                                       @onchange="UpdateCheckOutDate" />
+                                type="text"
+                                class="form-control"
+                                data-jdp
+                                data-jdp-miladi-input="miladi_dateE"
+                                placeholder="شمسی"
+                                autocomplete="off"
+                                @onchange="UpdateCheckOutDate" />
                                 <input id="miladi_dateE" type="hidden" @bind="MiladiCheckOut" />
                             </div>
                         </div>
@@ -119,10 +121,12 @@
                                 <th>عکس</th>
                                 <th>نام کامل</th>
                                 <th>کد ملی</th>
+                                <th>پلاک</th>
                                 <th>ملاقات‌شونده</th>
                                 <th>شماره تماس</th>
-                                <th>زمان ورود</th>.
+                                <th>زمان ورود</th>
                                 <th>زمان خروج</th>
+                                <th>عملیات</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -131,17 +135,53 @@
                                 <tr>
                                     <td>
                                         <img src="@GetVisitorImage(v.PhotoPath)"
-                                             class="img-circle elevation-2"
-                                             alt="@v.FullName"
-                                             style="width:50px;height:50px;object-fit:cover;" />
+                                        class="img-circle elevation-2"
+                                        alt="@v.FullName"
+                                        style="width:50px;height:50px;object-fit:cover;" />
                                     </td>
                                     <td><strong>@v.FullName</strong></td>
                                     <td>@v.NationalCode</td>
+                                    <td>
+                                        @{
+                                            if (!string.IsNullOrEmpty(v.Vehicles.PlatePart1))
+                                            {
+                                                <div class="plate-tooltip">
+                                                    <i class="fas fa-car text-primary"></i>
+                                                    <span class="tooltiptext">
+                                                        <Plate Part1="@v.Vehicles.PlatePart1"
+                                                        Letter="@v.Vehicles.PlateLetter.GetDescription()"
+                                                        Part3="@v.Vehicles.PlatePart3"
+                                                        Part4="@v.Vehicles.PlatePart4" />
+                                                    </span>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">بدون وسیله</span>
+                                            }
+                                        }
+                                    </td>
                                     <td>@v.HostName</td>
                                     <td dir="ltr">@v.PhoneNumber</td>
                                     <td>@v.RegisterDateTime.ToPeString("yyyy/MM/dd - HH:mm")</td>
                                     <td>@v.ExitDateTime?.ToPeString("yyyy/MM/dd - HH:mm")</td>
+                                    <td>
+                                        @{
+                                            if (!string.IsNullOrEmpty(v.Vehicles.PlatePart1))
+                                            {
+                                                <button class="btn btn-info btn-sm"
+                                                        @onclick="() => ShowVehicleImage(v.Vehicles.VehiclePhotoPath)"
+                                                        title="نمایش عکس پلاک">
+                                                    <i class="fas fa-image"></i> نمایش
+                                                </button>
+                                            }
+                                        }
 
+                                        <button class="btn btn-danger btn-sm ml-1"
+                                                @onclick="() => ConfirmExit(v.Id, v.FullName)">
+                                            <i class="fas fa-sign-out-alt"></i> خروج
+                                        </button>
+                                    </td>
                                 </tr>
                             }
                         </tbody>
@@ -157,6 +197,7 @@
     private ConfirmModal? confirmModal;
     private int pendingVisitorId;
     private string pendingVisitorName = "";
+    private ImageModal? imageModal;
     private string searchQuery = "";
     private string MiladiCheckIn = "";
     private string MiladiCheckOut = "";
@@ -336,5 +377,13 @@
     {
         if (!string.IsNullOrEmpty(imagename)) return $"/uploads/visitors/{imagename}";
         return $"/";
+    }
+    private void ShowVehicleImage(string? imagename)
+    {
+        var url = !string.IsNullOrEmpty(imagename)
+            ? $"/uploads/Vehiclevisitors/{imagename}"
+            : null;
+
+        imageModal?.Show(url);
     }
 }

@@ -49,7 +49,7 @@ builder.Services.AddMediatR(cfg =>
 
 // Add FluentValidation
 builder.Services.AddValidatorsFromAssembly(typeof(Application.Commands.Users.RegisterUser.RegisterUserCommandValidator).Assembly);
-
+builder.Services.AddValidatorsFromAssembly(typeof(Application.Commands.Visitors.RegisterVisitor.RegisterVisitorCommandValidator).Assembly);
 // Add AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddInfrastructure(builder.Configuration);

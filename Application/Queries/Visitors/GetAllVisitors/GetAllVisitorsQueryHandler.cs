@@ -1,4 +1,5 @@
 ﻿using Application.DTOs.Visitor;
+using Domain.Enums;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -15,5 +16,12 @@ namespace Application.Queries.Visitors.GetAllVisitors
         public DateTime? EnterTime { get; set; }
         public DateTime? ExitTime { get; set; }
         public string? PhotoPath { get; set; }
+
+        public string? PlatePart1 { get; set; }
+        public PlateLetter? PlateLetter { get; set; }
+        public string? PlatePart3 { get; set; }
+        public string? PlatePart4 { get; set; }
+        public string? PhotovehiclePath { get; set; }
+
     }
 }

@@ -1,20 +1,12 @@
 ﻿@page "/panel/visitors/create"
+@using Domain.Enums
 @attribute [Authorize]
 @layout PanelLayout
 @inherits BaseComponent
 @implements IDisposable
 <PageTitle>ثبت ملاقات‌کننده</PageTitle>
 
-<section class="content-header">
-    <div class="container-fluid">
-        <div class="row mb-2">
-            <div class="col-sm-6">
-                <h1>ایجاد ملاقات کننده در دانشگاه</h1>
-            </div>
-        </div>
-    </div>
-</section>
-
+<!-- Header -->
 <section class="content-header">
     <div class="container-fluid">
         <div class="row mb-2">
@@ -23,7 +15,7 @@
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-left">
-                    <li class="breadcrumb-item"><a href="#">خانه</a></li>
+                    <li class="breadcrumb-item"><a href="/panel">خانه</a></li>
                     <li class="breadcrumb-item active">ثبت ملاقات‌کننده</li>
                 </ol>
             </div>
@@ -31,6 +23,7 @@
     </div>
 </section>
 
+<!-- Messages -->
 @if (!string.IsNullOrEmpty(SuccessMessage))
 {
     <div class="alert alert-success alert-dismissible fade show mt-3">
@@ -40,7 +33,6 @@
         </button>
     </div>
 }
-
 @if (!string.IsNullOrEmpty(ErrorMessage))
 {
     <div class="alert alert-danger alert-dismissible fade show mt-3">
@@ -51,13 +43,13 @@
     </div>
 }
 
+<!-- Main Card -->
 <div class="card card-primary card-outline">
     <div class="card-header">
         <h3 class="card-title">
             <i class="fas fa-user-plus"></i> ثبت ملاقات‌کننده جدید
         </h3>
     </div>
-
     <div class="card-body">
         <EditForm Model="visitor" OnValidSubmit="HandleSubmit">
             <DataAnnotationsValidator />
@@ -125,19 +117,17 @@
                         <video id="webcamVideo" autoplay playsinline style="width: 100%; max-height: 300px; border: 2px solid #ddd; border-radius: 8px;"></video>
                         <canvas id="webcamCanvas" style="display: none;"></canvas>
                     </div>
-
                     <div class="mt-3">
                         <button type="button" class="btn btn-success" @onclick="StartWebcam" disabled="@isRunning">
                             <i class="fas fa-video"></i> شروع وب‌کم
                         </button>
                         <button type="button" class="btn btn-danger" @onclick="StopWebcam" disabled="@(!isRunning)">
-                            <i class="fas fa-video-slash"></i> توقف وب‌کم
+                            <i class="fas fa-video-slash"></i> توقف
                         </button>
                         <button type="button" class="btn btn-info" @onclick="TakePhoto" disabled="@(!isRunning)">
                             <i class="fas fa-camera"></i> عکس گرفتن
                         </button>
                     </div>
-
                     @if (!string.IsNullOrEmpty(previewImage))
                     {
                         <div class="mt-3 text-center">
@@ -145,7 +135,7 @@
                             <img src="@previewImage" alt="پیش‌نمایش" style="max-width: 100%; max-height: 250px; border: 2px solid #007bff; border-radius: 8px;" />
                             <div class="mt-2">
                                 <button type="button" class="btn btn-sm btn-outline-danger" @onclick="ClearPhoto">
-                                    <i class="fas fa-trash"></i> حذف عکس
+                                    <i class="fas fa-trash"></i> حذف
                                 </button>
                             </div>
                         </div>
@@ -153,11 +143,144 @@
                 </div>
             </div>
 
+            <!-- بخش خودرو -->
+            <div class="form-group mt-4">
+                <label class="d-flex align-items-center">
+                    <InputCheckbox @bind-Value="visitor.HasVehicle" class="mr-2" />
+                    <i class="fas fa-car"></i> ثبت اطلاعات خودرو (اختیاری)
+                </label>
+            </div>
+
+            @if (visitor.HasVehicle)
+            {
+                <div class="card card-warning card-outline mt-3">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-car-side"></i> اطلاعات خودرو
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- پلاک ایرانی -->
+                            <div class="col-md-6">
+                                <label>پلاک خودرو <span class="text-danger">*</span></label>
+                                <div class="license-plate-container mb-3">
+                                    <div class="license-plate">
+                                        <div class="left-section">
+                                            <div class="flag"></div>
+                                            <div class="country">
+                                                <span>I.R.</span>
+                                                <span>IRAN</span>
+                                            </div>
+                                        </div>
+                                        <div class="main-section">
+                                            <div class="numbers">
+                                                <div class="digit">@(visitor.PlatePart1 ?? "--")</div>
+                                                <div class="letter">@(visitor.PlateLetter?.GetDescription() ?? "الف")</div>
+                                                <div class="digit">@(visitor.PlatePart3 ?? "--")</div>
+                                            </div>
+                                        </div>
+                                        <div class="right-section">
+                                            <div class="code">@(visitor.PlatePart4 ?? "--")</div>
+                                            <div class="label">ایران</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-3">
+                                        <InputText @bind-Value="visitor.PlatePart1" class="form-control text-center" placeholder="۱۲" maxlength="2" />
+                                        <ValidationMessage For="@(() => visitor.PlatePart1)" class="text-danger" />
+                                    </div>
+                                    <div class="col-3">
+                                        <InputSelect @bind-Value="visitor.PlateLetter" class="form-control text-center">
+                                            <option value="">حرف</option>
+                                            @foreach (var letter in Enum.GetValues(typeof(PlateLetter)).Cast<PlateLetter>())
+                                            {
+                                                <option value="@letter">@letter.GetDescription()</option>
+                                            }
+                                        </InputSelect>
+                                    </div>
+                                    <div class="col-3">
+                                        <InputText @bind-Value="visitor.PlatePart3" class="form-control text-center" placeholder="۳۴" maxlength="3" />
+                                        <ValidationMessage For="@(() => visitor.PlatePart3)" class="text-danger" />
+                                    </div>
+                                    <div class="col-3">
+                                        <InputText @bind-Value="visitor.PlatePart4" class="form-control text-center" placeholder="۵۶" maxlength="2" />
+                                        <ValidationMessage For="@(() => visitor.PlatePart4)" class="text-danger" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- نوع، رنگ، برند -->
+                            <div class="col-md-6">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>نوع خودرو</label>
+                                            <InputSelect @bind-Value="visitor.VehicleType" class="form-control">
+                                                <option value="">انتخاب کنید</option>
+                                                @foreach (var type in Enum.GetValues(typeof(VehicleType)).Cast<VehicleType>())
+                                                {
+                                                    <option value="@type">@type.GetDescription()</option>
+                                                }
+                                            </InputSelect>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>رنگ خودرو</label>
+                                            <InputText @bind-Value="visitor.Color" class="form-control" placeholder="مثال: سفید" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label>برند خودرو</label>
+                                            <InputText @bind-Value="visitor.Brand" class="form-control" placeholder="مثال: پراید" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- وب‌کم پلاک -->
+                            <div class="col-md-6 mt-3">
+                                <div class="webcam-container text-center">
+                                    <video id="@PlateVideoElementId" autoplay playsinline style="width: 100%; max-height: 250px; border: 2px solid #ffc107; border-radius: 8px;"></video>
+                                    <canvas id="@PlateCanvasElementId" style="display: none;"></canvas>
+                                </div>
+                                <div class="mt-2">
+                                    <button type="button" class="btn btn-success btn-sm" @onclick="StartPlateWebcam" disabled="@isPlateCamRunning">
+                                        <i class="fas fa-video"></i> شروع
+                                    </button>
+                                    <button type="button" class="btn btn-danger btn-sm" @onclick="StopPlateWebcam" disabled="@(!isPlateCamRunning)">
+                                        <i class="fas fa-video-slash"></i> توقف
+                                    </button>
+                                    <button type="button" class="btn btn-info btn-sm" @onclick="TakePlatePhoto" disabled="@(!isPlateCamRunning)">
+                                        <i class="fas fa-camera"></i> عکس
+                                    </button>
+                                </div>
+                                @if (!string.IsNullOrEmpty(previewVehicleImage))
+                                {
+                                    <div class="mt-2 text-center">
+                                        <h6 class="text-warning">پیش‌نمایش پلاک</h6>
+                                        <img src="@previewVehicleImage" style="max-width: 100%; max-height: 150px; border: 2px solid #ffc107; border-radius: 8px;" />
+                                        <button type="button" class="btn btn-sm btn-outline-danger mt-1" @onclick="ClearPlatePhoto">
+                                            <i class="fas fa-trash"></i> حذف
+                                        </button>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Buttons -->
             <div class="text-right mt-4">
-                <button type="button" class="btn  btn-outline-primary btn-lg" @onclick='() => Navigation.NavigateTo("/panel/visitors")'>
+                <button type="button" class="btn btn-outline-secondary btn-lg" @onclick='() => Navigation.NavigateTo("/panel/visitors")'>
                     <i class="fas fa-arrow-left"></i> انصراف
                 </button>
-                <button type="submit" class="btn btn-primary ml-2" disabled="@isSubmitting">
+                <button type="submit" class="btn btn-primary btn-lg ml-2" disabled="@isSubmitting">
                     @if (isSubmitting)
                     {
                         <i class="fas fa-spinner fa-spin"></i>
@@ -165,7 +288,7 @@
                     else
                     {
                         <span>ذخیره</span>
-                        }
+                    }
                 </button>
             </div>
         </EditForm>
@@ -175,6 +298,7 @@
 @code {
     private VisitorDto visitor = new();
     private string? previewImage;
+    private string? previewVehicleImage;
     private bool isSubmitting = false;
     private string? SuccessMessage;
     private string? ErrorMessage;
@@ -183,7 +307,67 @@
     private const string VideoElementId = "webcamVideo";
     private const string CanvasElementId = "webcamCanvas";
 
-    private async Task StartWebcam()
+    private const string PlateVideoElementId = "plateWebcamVideo";
+    private const string PlateCanvasElementId = "plateWebcamCanvas";
+    private bool isPlateCamRunning = false;
+
+ 
+
+    private void ClearPhoto()
+    {
+        visitor.PhotoBase64 = null;
+        previewImage = null;
+        StateHasChanged();
+    }
+
+    private async Task HandleSubmit(EditContext context)
+    {
+        // اعتبارسنجی شرطی برای ماشین
+        if (visitor.HasVehicle)
+        {
+            if (string.IsNullOrWhiteSpace(visitor.PlatePart1) ||
+                string.IsNullOrWhiteSpace(visitor.PlateLetter.ToString()) ||
+                string.IsNullOrWhiteSpace(visitor.PlatePart3) ||
+                string.IsNullOrWhiteSpace(visitor.PlatePart4))
+            {
+                ErrorMessage = "لطفاً تمام قسمت‌های پلاک را وارد کنید.";
+                return;
+            }
+        }
+
+        if (!context.Validate()) return;
+
+        isSubmitting = true;
+        ErrorMessage = null;
+        SuccessMessage = null;
+
+        try
+        {
+            var response = await Http.PostAsJsonAsync("api/visitors/register", visitor);
+            if (response.IsSuccessStatusCode)
+            {
+                SuccessMessage = "ملاقات‌کننده با موفقیت ثبت شد.";
+                await Task.Delay(1500);
+                Navigation.NavigateTo("/panel/visitors");
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                ErrorMessage = error;
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "خطا در ارتباط با سرور: " + ex.Message;
+        }
+        finally
+        {
+            isSubmitting = false;
+            StateHasChanged();
+        }
+    }
+
+       private async Task StartWebcam()
     {
         var result = await JSRuntime.InvokeAsync<bool>("startWebcam", VideoElementId);
         if (result)
@@ -228,46 +412,52 @@
         }
     }
 
-    private void ClearPhoto()
+    private async Task StartPlateWebcam()
     {
-        visitor.PhotoBase64 = null;
-        previewImage = null;
-        StateHasChanged();
+        var result = await JSRuntime.InvokeAsync<bool>("startWebcam", PlateVideoElementId);
+        if (result)
+        {
+            isPlateCamRunning = true;
+            ErrorMessage = null;
+        }
+        else
+        {
+            ErrorMessage = "دسترسی به وب‌کم پلاک امکان‌پذیر نیست.";
+        }
     }
 
-    private async Task HandleSubmit(EditContext context)
+    private async Task StopPlateWebcam()
     {
-        if (!context.Validate()) return;
+        await JSRuntime.InvokeVoidAsync("stopWebcam", PlateVideoElementId);
+        isPlateCamRunning = false;
+    }
 
-        isSubmitting = true;
-        ErrorMessage = null;
-        SuccessMessage = null;
-
+    private async Task TakePlatePhoto()
+    {
         try
         {
-            var response = await Http.PostAsJsonAsync("api/visitors/register", visitor);
-            if (response.IsSuccessStatusCode)
+            var base64 = await JSRuntime.InvokeAsync<string>("takePhoto", PlateVideoElementId, PlateCanvasElementId);
+            if (!string.IsNullOrEmpty(base64) && base64.Contains(','))
             {
-                SuccessMessage = "ملاقات‌کننده با موفقیت ثبت شد.";
-                await Task.Delay(1500);
-                Navigation.NavigateTo("/panel/visitors");
-            }
-            else
-            {
-                var error = await response.Content.ReadAsStringAsync();
-                ErrorMessage = "لطفاً اطلاعات را درست وارد کنید.";
+                visitor.VehiclePhotoBase64 = base64.Split(',')[1];
+                previewVehicleImage = base64;
+                StateHasChanged();
+                SuccessMessage = "عکس پلاک گرفته شد.";
             }
         }
         catch (Exception ex)
         {
-            ErrorMessage = "خطا در ارتباط با سرور: " + ex.Message;
-        }
-        finally
-        {
-            isSubmitting = false;
-            StateHasChanged();
+            ErrorMessage = "خطا در عکس پلاک: " + ex.Message;
         }
     }
+
+    private void ClearPlatePhoto()
+    {
+        visitor.VehiclePhotoBase64 = null;
+        previewVehicleImage = null;
+        StateHasChanged();
+    }
+
 
     public void Dispose()
     {

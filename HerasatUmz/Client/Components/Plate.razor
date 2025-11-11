@@ -1,0 +1,38 @@
+﻿@* Components/IranianLicensePlate.razor *@
+
+<div class="license-plate">
+    <!-- بخش سمت چپ (پرچم و ایران) -->
+    <div class="left-section">
+        <div class="flag"></div>
+        <div class="country">
+            <span>I.R.</span>
+            <span>IRAN</span>
+        </div>
+    </div>
+
+    <div class="main-section">
+        <div class="numbers">
+            <div class="digit">@Part1</div>
+            <div class="letter">@Letter</div>
+            <div class="digit">@Part3</div>
+        </div>
+    </div>
+    <div class="right-section">
+        <div class="code">@Part4</div>
+        <div class="label">ایران</div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public string Part1 { get; set; } = "—";
+    [Parameter] public string Letter { get; set; } = "—";
+    [Parameter] public string Part3 { get; set; } = "—";
+    [Parameter] public string Part4 { get; set; } = "۱۱";
+
+
+    protected override void OnParametersSet()
+    {
+
+    }
+
+}

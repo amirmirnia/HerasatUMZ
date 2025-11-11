@@ -19,7 +19,7 @@ namespace Application.Queries.Visitors.GetAllVisitors
 
         public async Task<List<VisitorVM>> Handle(GetAllVisitorsQueryHandler request, CancellationToken cancellationToken)
         {
-            var query = _context.Visitors
+            var query = _context.Visitors.Include(x=>x.Vehicles)
                 .AsNoTracking()
                 .Where(v => v.IsInside == request.IsInside);
 

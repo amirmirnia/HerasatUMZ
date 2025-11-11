@@ -13,27 +13,18 @@ namespace Domain.Entities.Vehicles
 {
     public class Vehicle : BaseEntity
     {
-        [Required]
         public string PlatePart1 { get; set; } = string.Empty;
-
-        [Required]
-        public string PlatePart2 { get; set; } = string.Empty;
-
-        [Required]
+        public PlateLetter? PlateLetter { get; set; }
         public string PlatePart3 { get; set; } = string.Empty; 
-
-        [Required]
         public string PlatePart4 { get; set; } = string.Empty; 
-
         public VehicleType? VehicleType { get; set; } 
         public string? Color { get; set; }
         public string? Brand { get; set; }
 
         public DateTime EntryDateTime { get; set; } = DateTime.Now;
         public DateTime? ExitDateTime { get; set; }
-        public bool IsInside { get; set; } = true;
 
-        public string? PlatePhotoPath { get; set; }
+        public string? VehiclePhotoPath { get; set; }
 
         [ForeignKey(nameof(Visitor))]
         public int VisitorId { get; set; }
