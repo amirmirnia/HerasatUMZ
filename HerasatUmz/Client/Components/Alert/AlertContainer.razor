@@ -5,7 +5,7 @@
 
 @foreach (var alert in alerts)
 {
-    <Alert Type="alert.Type" Title="alert.Title" OnClose="() => Remove(alert.Id)">
+    <Alert Type="@alert.Type" Title="@alert.Title" OnClose="() => Remove(alert.Id)">
         @alert.Message
     </Alert>
 }
