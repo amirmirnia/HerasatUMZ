@@ -7,6 +7,7 @@ using Blazored.LocalStorage;
 using Domain.Enum;
 using Client.Services.Interface;
 using Client.Services.Repository;
+using Client.Services.Alert;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -17,6 +18,7 @@ builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<AuthenticationStateProvider, JwtAuthenticationStateProvider>();
 builder.Services.AddTransient<IVisitLogger, VisitLogger>();
 builder.Services.AddScoped<UserContextService>();
+builder.Services.AddScoped<AlertService>();
 
 builder.Services.AddAuthorizationCore(options =>
 {

@@ -3,9 +3,13 @@
 @inject NavigationManager Navigation
 @inject HttpClient Http
 @inject UserContextService UserContext
+@using Client.Components.Alert
 @using Microsoft.AspNetCore.Components.Authorization
 @inject AuthenticationStateProvider AuthStateProvider
 
+
+
+<AlertContainer />
 <body class="hold-transition sidebar-mini">
     <div class="wrapper">
         <!-- Navbar -->
@@ -44,7 +48,7 @@
 
                         <!-- داشبورد - همه می‌بینند -->
                         <li class="nav-item">
-                            <a href="/panel/users" class="nav-link">
+                            <a href="/panel" class="nav-link">
                                 <i class="nav-icon fa fa-dashboard"></i>
                                 <p>داشبورد</p>
                             </a>

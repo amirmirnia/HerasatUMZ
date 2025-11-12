@@ -1,0 +1,54 @@
+﻿
+<div class="alert-wrapper @(IsVisible ? "show" : "")">
+    <div class="alert alert-@Type @CssClass" role="alert">
+        <div class="alert-icon">
+            @switch (Type)
+            {
+                case AlertType.Success:
+                    <svg viewBox="0 0 24 24"><path fill="currentColor" d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" /></svg>
+                    break;
+                case AlertType.Warning:
+                    <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2L1 21h22L12 2zm0 4.5l7.5 13H4.5l7.5-13zM12 9v4m0 3h.01" /></svg>
+                    break;
+                case AlertType.Error:
+                    <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15l-5-5 1.41-1.41L11 14.17l7.59-7.59L20 8l-9 9z" /></svg>
+                    break;
+                case AlertType.Info:
+                    <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z" /></svg>
+                    break;
+            }
+        </div>
+        <div class="alert-content">
+            @if (!string.IsNullOrEmpty(Title))
+            {
+                <strong class="alert-title">@Title</strong>
+            }
+            <span>@ChildContent</span>
+        </div>
+        @if (Closable)
+        {
+            <button class="alert-close" @onclick="Close">
+                <svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" /></svg>
+            </button>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public AlertType Type { get; set; } = AlertType.Info;
+    [Parameter] public bool Closable { get; set; } = true;
+    [Parameter] public string? CssClass { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+
+    private bool IsVisible = true;
+
+    private async Task Close()
+    {
+        IsVisible = false;
+        await Task.Delay(300); // صبر برای انیمیشن
+        await OnClose.InvokeAsync();
+    }
+
+}

@@ -13,35 +13,9 @@
             <div class="col-sm-6">
                 <h1>ثبت ملاقات‌کننده</h1>
             </div>
-            <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-left">
-                    <li class="breadcrumb-item"><a href="/panel">خانه</a></li>
-                    <li class="breadcrumb-item active">ثبت ملاقات‌کننده</li>
-                </ol>
-            </div>
         </div>
     </div>
 </section>
-
-<!-- Messages -->
-@if (!string.IsNullOrEmpty(SuccessMessage))
-{
-    <div class="alert alert-success alert-dismissible fade show mt-3">
-        <i class="fas fa-check-circle"></i> @SuccessMessage
-        <button type="button" class="close" @onclick="() => SuccessMessage = null">
-            <span>&times;</span>
-        </button>
-    </div>
-}
-@if (!string.IsNullOrEmpty(ErrorMessage))
-{
-    <div class="alert alert-danger alert-dismissible fade show mt-3">
-        <i class="fas fa-exclamation-triangle"></i> @ErrorMessage
-        <button type="button" class="close" @onclick="() => ErrorMessage = null">
-            <span>&times;</span>
-        </button>
-    </div>
-}
 
 <!-- Main Card -->
 <div class="card card-primary card-outline">
@@ -166,6 +140,35 @@
                                 <label>پلاک خودرو <span class="text-danger">*</span></label>
                                 <div class="license-plate-container mb-3">
                                     <div class="license-plate">
+                                        <div class="right-section">
+                                            <div class="code">
+                                                <InputText @bind-Value="visitor.PlatePart4" class="form-control text-center" placeholder="۵۶" maxlength="2" />
+                                                <ValidationMessage For="@(() => visitor.PlatePart4)" class="text-danger" />
+                                            </div>
+                                            <div class="label">ایران</div>
+                                        </div>
+                                        
+                                        <div class="main-section">
+                                            <div class="numbers">
+                                                <div class="digit">
+                                                    <InputText @bind-Value="visitor.PlatePart1" class="form-control text-center" placeholder="۱۲" maxlength="2" />
+                                                    <ValidationMessage For="@(() => visitor.PlatePart1)" class="text-danger" />
+                                                </div>
+                                                <div class="letter">
+                                                    <InputSelect @bind-Value="visitor.PlateLetter">
+                                                        <option value="">حرف</option>
+                                                        @foreach (var letter in Enum.GetValues(typeof(PlateLetter)).Cast<PlateLetter>())
+                                                        {
+                                                            <option value="@letter">@letter.GetDescription()</option>
+                                                        }
+                                                    </InputSelect>
+                                                </div>
+                                                <div class="digit">
+                                                    <InputText @bind-Value="visitor.PlatePart3" class="form-control text-center" placeholder="458" maxlength="3" />
+                                                    <ValidationMessage For="@(() => visitor.PlatePart3)" class="text-danger" />
+                                                </div>
+                                            </div>
+                                        </div>
                                         <div class="left-section">
                                             <div class="flag"></div>
                                             <div class="country">
@@ -173,41 +176,6 @@
                                                 <span>IRAN</span>
                                             </div>
                                         </div>
-                                        <div class="main-section">
-                                            <div class="numbers">
-                                                <div class="digit">@(visitor.PlatePart1 ?? "--")</div>
-                                                <div class="letter">@(visitor.PlateLetter?.GetDescription() ?? "الف")</div>
-                                                <div class="digit">@(visitor.PlatePart3 ?? "--")</div>
-                                            </div>
-                                        </div>
-                                        <div class="right-section">
-                                            <div class="code">@(visitor.PlatePart4 ?? "--")</div>
-                                            <div class="label">ایران</div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-3">
-                                        <InputText @bind-Value="visitor.PlatePart1" class="form-control text-center" placeholder="۱۲" maxlength="2" />
-                                        <ValidationMessage For="@(() => visitor.PlatePart1)" class="text-danger" />
-                                    </div>
-                                    <div class="col-3">
-                                        <InputSelect @bind-Value="visitor.PlateLetter" class="form-control text-center">
-                                            <option value="">حرف</option>
-                                            @foreach (var letter in Enum.GetValues(typeof(PlateLetter)).Cast<PlateLetter>())
-                                            {
-                                                <option value="@letter">@letter.GetDescription()</option>
-                                            }
-                                        </InputSelect>
-                                    </div>
-                                    <div class="col-3">
-                                        <InputText @bind-Value="visitor.PlatePart3" class="form-control text-center" placeholder="۳۴" maxlength="3" />
-                                        <ValidationMessage For="@(() => visitor.PlatePart3)" class="text-danger" />
-                                    </div>
-                                    <div class="col-3">
-                                        <InputText @bind-Value="visitor.PlatePart4" class="form-control text-center" placeholder="۵۶" maxlength="2" />
-                                        <ValidationMessage For="@(() => visitor.PlatePart4)" class="text-danger" />
                                     </div>
                                 </div>
                             </div>
@@ -284,7 +252,7 @@
                     @if (isSubmitting)
                     {
                         <i class="fas fa-spinner fa-spin"></i>
-                        }
+                    }
                     else
                     {
                         <span>ذخیره</span>
@@ -300,8 +268,6 @@
     private string? previewImage;
     private string? previewVehicleImage;
     private bool isSubmitting = false;
-    private string? SuccessMessage;
-    private string? ErrorMessage;
     private bool isRunning = false;
 
     private const string VideoElementId = "webcamVideo";
@@ -311,7 +277,7 @@
     private const string PlateCanvasElementId = "plateWebcamCanvas";
     private bool isPlateCamRunning = false;
 
- 
+
 
     private void ClearPhoto()
     {
@@ -330,7 +296,8 @@
                 string.IsNullOrWhiteSpace(visitor.PlatePart3) ||
                 string.IsNullOrWhiteSpace(visitor.PlatePart4))
             {
-                ErrorMessage = "لطفاً تمام قسمت‌های پلاک را وارد کنید.";
+                _AlertService.Show("لطفاً تمام قسمت‌های پلاک را وارد کنید.", "هشدار", AlertType.Error);
+
                 return;
             }
         }
@@ -338,27 +305,27 @@
         if (!context.Validate()) return;
 
         isSubmitting = true;
-        ErrorMessage = null;
-        SuccessMessage = null;
+
 
         try
         {
             var response = await Http.PostAsJsonAsync("api/visitors/register", visitor);
             if (response.IsSuccessStatusCode)
             {
-                SuccessMessage = "ملاقات‌کننده با موفقیت ثبت شد.";
-                await Task.Delay(1500);
-                Navigation.NavigateTo("/panel/visitors");
+
+                Navigation.NavigateTo("/panel/visitors?toastMessage=ملاقات کننده با موفقیت ایجاد شد&toastType=Success");
             }
             else
             {
                 var error = await response.Content.ReadAsStringAsync();
-                ErrorMessage = error;
+                _AlertService.Show(error, "هشدار", AlertType.Error);
+
             }
         }
         catch (Exception ex)
         {
-            ErrorMessage = "خطا در ارتباط با سرور: " + ex.Message;
+            _AlertService.Show("خطا در ارتباط با سرور: ", "هشدار", AlertType.Error);
+
         }
         finally
         {
@@ -367,17 +334,18 @@
         }
     }
 
-       private async Task StartWebcam()
+    private async Task StartWebcam()
     {
         var result = await JSRuntime.InvokeAsync<bool>("startWebcam", VideoElementId);
         if (result)
         {
             isRunning = true;
-            ErrorMessage = null;
+
         }
         else
         {
-            ErrorMessage = "دسترسی به وب‌کم امکان‌پذیر نیست. لطفاً مجوز را بررسی کنید.";
+            _AlertService.Show("دسترسی به وب‌کم امکان‌پذیر نیست. لطفاً مجوز را بررسی کنید.", "هشدار", AlertType.Error);
+
         }
     }
 
@@ -398,17 +366,19 @@
                 previewImage = base64; // برای نمایش
                 StateHasChanged();
 
-                SuccessMessage = "عکس با موفقیت گرفته شد.";
-                ErrorMessage = null;
+                _AlertService.Show("عکس با موفقیت گرفته شد.", "هشدار", AlertType.Error);
+
             }
             else
             {
-                ErrorMessage = "خطا در گرفتن عکس.";
+                _AlertService.Show("خطا در گرفتن عکس.", "هشدار", AlertType.Error);
+
             }
         }
         catch (Exception ex)
         {
-            ErrorMessage = "خطا در گرفتن عکس: " + ex.Message;
+            _AlertService.Show("خطا در گرفتن عکس: ", "هشدار", AlertType.Error);
+
         }
     }
 
@@ -418,11 +388,11 @@
         if (result)
         {
             isPlateCamRunning = true;
-            ErrorMessage = null;
         }
         else
         {
-            ErrorMessage = "دسترسی به وب‌کم پلاک امکان‌پذیر نیست.";
+            _AlertService.Show("دسترسی به وب‌کم پلاک امکان‌پذیر نیست.", "هشدار", AlertType.Error);
+
         }
     }
 
@@ -442,12 +412,14 @@
                 visitor.VehiclePhotoBase64 = base64.Split(',')[1];
                 previewVehicleImage = base64;
                 StateHasChanged();
-                SuccessMessage = "عکس پلاک گرفته شد.";
+                _AlertService.Show("عکس پلاک گرفته شد.", "هشدار", AlertType.Error);
+
             }
         }
         catch (Exception ex)
         {
-            ErrorMessage = "خطا در عکس پلاک: " + ex.Message;
+            _AlertService.Show("خطا در عکس پلاک: ", "هشدار", AlertType.Error);
+
         }
     }
 

@@ -188,7 +188,7 @@
                                 </td>
                                 <td>
                                     @{
-                                        if (user.Role!=UserRole.Admin)
+                                        if (user.Role != UserRole.Admin)
                                         {
                                             <div class="btn-group btn-group-sm">
                                                 @if (user.IsActive)
@@ -217,7 +217,7 @@
                                             <p>ادمین برنامه</p>
                                         }
                                     }
-                                    
+
                                 </td>
                             </tr>
                         }
@@ -260,7 +260,6 @@
     private string selectedCompany = "";
     private UserListDto? userToDelete;
     private bool isDeletingUser = false;
-    private string errorMessage = string.Empty;
     private int totalUsersCount = 0;
     private int activeUsersCount = 0;
     private int adminUsersCount = 0;
@@ -294,7 +293,7 @@
         }
         catch
         {
-            errorMessage = "خطا در بارگذاری آمار کاربران.";
+            _AlertService.Show("خطا در بارگذاری آمار کاربران.", "هشدار", AlertType.Error);
         }
     }
 
@@ -303,7 +302,6 @@
         try
         {
             isLoading = true;
-            errorMessage = string.Empty;
             StateHasChanged();
 
             var queryParams = new Dictionary<string, string?>
@@ -335,12 +333,13 @@
             }
             else
             {
-                errorMessage = "خطا در بارگذاری لیست کاربران.";
+                _AlertService.Show("خطا در بارگذاری لیست کاربران.", "هشدار", AlertType.Error);
             }
         }
         catch
         {
-            errorMessage = "خطای غیرمنتظره در بارگذاری کاربران.";
+            _AlertService.Show("خطای غیرمنتظره در بارگذاری کاربران.", "هشدار", AlertType.Error);
+
         }
         finally
         {
@@ -365,7 +364,7 @@
         confirmModal?.Show("تأیید حذف", $"آیا از حذف {user.FullName}اطمینان دارید؟");
     }
 
-    
+
 
     private async Task ConfirmDelete(bool confirmed)
     {
@@ -381,16 +380,21 @@
             if (response.IsSuccessStatusCode)
             {
                 filteredUsers.Remove(userToDelete);
+                _AlertService.Show("کاربر مورد نظر حذف شد", null, AlertType.Error);
                 await LoadUsers();
+
             }
             else
             {
-                errorMessage = "خطا در حذف کاربر.";
+                _AlertService.Show("خطا در حذف کاربر.", "هشدار", AlertType.Error);
+
+
             }
         }
         catch
         {
-            errorMessage = "خطای غیرمنتظره در حذف کاربر.";
+            _AlertService.Show("خطای غیرمنتظره در حذف کاربر.", "هشدار", AlertType.Error);
+
         }
         finally
         {

@@ -12,5 +12,8 @@ namespace Application.DTOs.Visitor
         public string searchQuery { get; set; }
         public DateTime? EnterTime { get; set; }
         public DateTime? ExitTime { get; set; }
+        public int pageNumber { get; set; }
+        public int pageSize { get; set; }
+
     }
 }

@@ -4,14 +4,6 @@
 @inherits BaseComponent
 <PageTitle>ایجاد کاربر</PageTitle>
 
-@if (!string.IsNullOrEmpty(errorMessage))
-{
-    <div class="callout callout-danger">
-        <h5><i class="fas fa-exclamation-triangle"></i> خطا</h5>
-        <p>@errorMessage</p>
-    </div>
-}
-
 <section class="content-header">
     <div class="container-fluid">
         <div class="row mb-2">
@@ -62,8 +54,8 @@
                                         <div class="input-group-prepend">
                                             <span class="input-group-text"><i class="fas fa-user"></i></span>
                                         </div>
-                                        <input @bind="registerUserDto.FirstName" 
-                                               class="form-control @GetValidationClass("FirstName")" 
+                                        <input @bind="registerUserDto.FirstName"
+                                               class="form-control @GetValidationClass("FirstName")"
                                                placeholder="نام" />
                                     </div>
                                     @if (validationErrors.ContainsKey("FirstName"))
@@ -80,8 +72,8 @@
                                         <div class="input-group-prepend">
                                             <span class="input-group-text"><i class="fas fa-user-tag"></i></span>
                                         </div>
-                                        <input @bind="registerUserDto.LastName" 
-                                               class="form-control @GetValidationClass("LastName")" 
+                                        <input @bind="registerUserDto.LastName"
+                                               class="form-control @GetValidationClass("LastName")"
                                                placeholder="نام خانوادگی" />
                                     </div>
                                     @if (validationErrors.ContainsKey("LastName"))
@@ -98,8 +90,8 @@
                                         <div class="input-group-prepend">
                                             <span class="input-group-text"><i class="fas fa-envelope"></i></span>
                                         </div>
-                                        <input type="email" @bind="registerUserDto.Email" 
-                                               class="form-control @GetValidationClass("Email")" 
+                                        <input type="email" @bind="registerUserDto.Email"
+                                               class="form-control @GetValidationClass("Email")"
                                                placeholder="example@mail.com" />
                                     </div>
                                     @if (validationErrors.ContainsKey("Email"))
@@ -116,8 +108,8 @@
                                         <div class="input-group-prepend">
                                             <span class="input-group-text"><i class="fas fa-briefcase"></i></span>
                                         </div>
-                                        <input @bind="registerUserDto.JobTitle" 
-                                               class="form-control @GetValidationClass("JobTitle")" 
+                                        <input @bind="registerUserDto.JobTitle"
+                                               class="form-control @GetValidationClass("JobTitle")"
                                                placeholder="شغل کاربر" />
                                     </div>
                                     @if (validationErrors.ContainsKey("JobTitle"))
@@ -134,8 +126,8 @@
                                         <div class="input-group-prepend">
                                             <span class="input-group-text"><i class="fas fa-id-card"></i></span>
                                         </div>
-                                        <input @bind="registerUserDto.IdCode" 
-                                               class="form-control @GetValidationClass("IdCode")" 
+                                        <input @bind="registerUserDto.IdCode"
+                                               class="form-control @GetValidationClass("IdCode")"
                                                placeholder="کد ملی" />
                                     </div>
                                     @if (validationErrors.ContainsKey("IdCode"))
@@ -194,12 +186,12 @@
                                         <div class="input-group-prepend">
                                             <span class="input-group-text"><i class="fas fa-lock"></i></span>
                                         </div>
-                                        <input type="@(showPassword?"text":"password")" 
+                                        <input type="@(showPassword?"text":"password")"
                                                @bind="registerUserDto.Password"
-                                               class="form-control @GetValidationClass("Password")" 
+                                               class="form-control @GetValidationClass("Password")"
                                                placeholder="رمز عبور" />
                                         <div class="input-group-append">
-                                            <button type="button" class="btn btn-outline-secondary" 
+                                            <button type="button" class="btn btn-outline-secondary"
                                                     @onclick="TogglePasswordVisibility" tabindex="-1">
                                                 <i class="fas @(showPassword?"fa-eye-slash":"fa-eye")"></i>
                                             </button>
@@ -220,7 +212,7 @@
                                             <span class="input-group-text"><i class="fas fa-lock"></i></span>
                                         </div>
                                         <input type="password" @bind="registerUserDto.ConfirmPassword"
-                                               class="form-control @GetValidationClass("ConfirmPassword")" 
+                                               class="form-control @GetValidationClass("ConfirmPassword")"
                                                placeholder="تکرار رمز عبور" />
                                     </div>
                                     @if (validationErrors.ContainsKey("ConfirmPassword"))
@@ -332,11 +324,11 @@
                             <button type="submit" class="btn btn-success btn-lg ml-3" disabled="@isSubmitting">
                                 @if (isSubmitting)
                                 {
-                                    <i class="fas fa-spinner fa-spin"></i> 
+                                    <i class="fas fa-spinner fa-spin"></i>
                                 }
                                 else
                                 {
-                                    <i class="fas fa-save"></i>
+                                    <span>ثبت</span>
                                 }
                             </button>
                         </div>
@@ -365,8 +357,6 @@
     private bool showSuccessMessage = false;
     private bool showPassword = false;
     private int currentStep = 1;
-    private string errorMessage = string.Empty;
-    private string toastType = "danger";
 
     private async Task HandleSubmit()
     {
@@ -376,7 +366,7 @@
         // اعتبارسنجی نهایی
         var step1Ok = await Validationstep1();
         var step2Ok = await Validationstep2();
-        if (!step1Ok || !step2Ok) 
+        if (!step1Ok || !step2Ok)
         {
             currentStep = step1Ok ? 2 : 1;
             return;
@@ -390,17 +380,18 @@
             {
                 showSuccessMessage = true;
                 await Task.Delay(1500);
-                Navigation.NavigateTo("/panel/users");
+                Navigation.NavigateTo("/panel/users?toastMessage=کاربر با موفقیت ایجاد شد&toastType=Success");
             }
             else
             {
-                errorMessage = await res.Content.ReadAsStringAsync();
-                toastType = "danger";
+                _AlertService.Show(await res.Content.ReadAsStringAsync(), "هشدار", AlertType.Error);
+
             }
         }
         catch (Exception ex)
         {
-            errorMessage = "خطا در ارتباط با سرور: " + ex.Message;
+            _AlertService.Show("خطا در ارتباط با سرور: ", "هشدار", AlertType.Error);
+
         }
         finally
         {
@@ -420,7 +411,7 @@
         if (string.IsNullOrWhiteSpace(registerUserDto.Email)) { validationErrors["Email"] = "ایمیل الزامی است"; ok = false; }
         else if (!Email.IsValidEmail(registerUserDto.Email)) { validationErrors["Email"] = "ایمیل نامعتبر است"; ok = false; }
         if (!string.IsNullOrWhiteSpace(registerUserDto.Phone) && !Phone.IsValidPhone(registerUserDto.Phone))
-            { validationErrors["Phone"] = "شماره موبایل نامعتبر است"; ok = false; }
+        { validationErrors["Phone"] = "شماره موبایل نامعتبر است"; ok = false; }
         return ok;
     }
 

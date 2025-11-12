@@ -2,132 +2,185 @@
 @attribute [Authorize]
 @inherits BaseComponent
 @layout PanelLayout
-
-
+@using System.Globalization
 <PageTitle>داشبورد</PageTitle>
 
-<section class="content-header">
+<!-- Content Header -->
+<div class="content-header">
     <div class="container-fluid">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <h1>داشبورد</h1>
+                <h1 class="m-0">
+                    <i class="fas fa-tachometer-alt"></i> داشبورد
+                </h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-left">
+                    <li class="breadcrumb-item"><a href="#">خانه</a></li>
+                    <li class="breadcrumb-item active">داشبورد</li>
+                </ol>
             </div>
         </div>
     </div>
-</section>
+</div>
 
-<section class="content">
-    <div class="row">
-        <div class="col-12 col-sm-6 col-md-3">
-            <div class="info-box">
-                <span class="info-box-icon bg-info elevation-1"><i class="fa fa-users"></i></span>
-                <div class="info-box-content">
-                    <span class="info-box-text">کل اعضا</span>
-                    <span class="info-box-number">@overview?.TotalUsers</span>
-                </div>
+<!-- Main content -->
+<div class="content">
+    <div class="container-fluid">
+        <!-- Loading State -->
+        @if (overview == null || visitLogs == null)
+        {
+            <div class="text-center py-5">
+                <i class="fas fa-spinner fa-spin fa-3x text-primary"></i>
+                <p class="mt-3">در حال بارگذاری داشبورد...</p>
             </div>
-        </div>
-
-        <div class="col-12 col-sm-6 col-md-3">
-            <div class="info-box mb-3">
-                <span class="info-box-icon bg-danger elevation-1"><i class="fa fa-user-secret"></i></span>
-                <div class="info-box-content">
-                    <span class="info-box-text">اعضا غیرفعال</span>
-                    <span class="info-box-number">@overview?.ActiveUsers</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-12 col-sm-6 col-md-3">
-            <div class="info-box mb-3">
-                <span class="info-box-icon bg-success elevation-1"><i class="fa fa-sign-in"></i></span>
-                <div class="info-box-content">
-                    <span class="info-box-text">کل مراجعین</span>
-                    <span class="info-box-number">@visitLogs?.Items.Count()</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-12 col-sm-6 col-md-3">
-            <div class="info-box mb-3">
-                <span class="info-box-icon bg-warning elevation-1"><i class="fa fa-location-arrow"></i></span>
-                <div class="info-box-content">
-                    <span class="info-box-text">افراد حاضر</span>
-                    <span class="info-box-number">2</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- جدول لاگ‌ها -->
-    <div class="row mt-4">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header border-transparent">
-                    <h3 class="card-title">لاگ‌های بازدید کاربران</h3>
+        }
+        else
+        {
+            <!-- Info Boxes -->
+            <div class="row">
+                <!-- کل اعضا -->
+                <div class="col-lg-3 col-6">
+                    <div class="small-box bg-indigo">
+                        <div class="inner">
+                            <h3>@overview.TotalUsers</h3>
+                            <p>کل اعضا</p>
+                        </div>
+                        <div class="icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <a href="#" class="small-box-footer">جزئیات <i class="fas fa-arrow-circle-left"></i></a>
+                    </div>
                 </div>
 
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table m-0">
-                            <thead>
-                                <tr>
-                                    <th>نام کاربر</th>
-                                    <th>کد ملی</th>
-                                    <th>IP</th>
-                                    <th>صفحه</th>
-                                    <th>نوع رویداد</th>
-                                    <th>تاریخ</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @if (visitLogs == null)
-                                {
-                                    <tr>
-                                        <td colspan="6" class="text-center text-muted">در حال بارگذاری...</td>
-                                    </tr>
-                                }
-                                else if (!visitLogs.Items.Any())
-                                {
-                                    <tr>
-                                        <td colspan="6" class="text-center text-muted">هیچ لاگی ثبت نشده است</td>
-                                    </tr>
-                                }
-                                else
-                                {
-                                    @foreach (var log in visitLogs.Items)
-                                    {
-                                        <tr>
-                                            <td>@log.UserName</td>
-                                            <td>@log.Codeid</td>
-                                            <td>@log.Ip</td>
-                                            <td>@log.Page</td>
-                                            <td>
-                                                @if (log.EventType == "enter")
-                                                {
-                                                    <span class="badge badge-success">ورود</span>
-                                                }
-                                                else if (log.EventType == "leave")
-                                                {
-                                                    <span class="badge badge-danger">خروج</span>
-                                                }
-                                                else
-                                                {
-                                                    <span class="badge badge-secondary">@log.EventType</span>
-                                                }
-                                            </td>
-                                            <td>@log.Timestamp?.ToLocalTime().ToString("yyyy/MM/dd HH:mm")</td>
-                                        </tr>
-                                    }
-                                }
-                            </tbody>
-                        </table>
+                <!-- اعضا غیرفعال -->
+                <div class="col-lg-3 col-6">
+                    <div class="small-box bg-danger">
+                        <div class="inner">
+                            <h3>@overview.ActiveUsers</h3>
+                            <p>اعضا غیرفعال</p>
+                        </div>
+                        <div class="icon">
+                            <i class="fas fa-user-secret"></i>
+                        </div>
+                        <a href="#" class="small-box-footer">جزئیات <i class="fas fa-arrow-circle-left"></i></a>
+                    </div>
+                </div>
+
+                <!-- کل مراجعین -->
+                <div class="col-lg-3 col-6">
+                    <div class="small-box bg-success">
+                        <div class="inner">
+                            <h3>@visitLogs.Items.Count()</h3>
+                            <p>کل مراجعین</p>
+                        </div>
+                        <div class="icon">
+                            <i class="fas fa-sign-in-alt"></i>
+                        </div>
+                        <a href="#" class="small-box-footer">جزئیات <i class="fas fa-arrow-circle-left"></i></a>
+                    </div>
+                </div>
+
+                <!-- افراد حاضر -->
+                <div class="col-lg-3 col-6">
+                    <div class="small-box bg-warning">
+                        <div class="inner">
+                            <h3>2</h3>
+                            <p>افراد حاضر</p>
+                        </div>
+                        <div class="icon">
+                            <i class="fas fa-location-arrow"></i>
+                        </div>
+                        <a href="#" class="small-box-footer">جزئیات <i class="fas fa-arrow-circle-left"></i></a>
                     </div>
                 </div>
             </div>
-        </div>
+            <!-- /.row -->
+            <!-- Visit Logs Table -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-history"></i> لاگ‌های بازدید کاربران
+                            </h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-widget="collapse">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover m-0">
+                                    <thead>
+                                        <tr>
+                                            <th>نام کاربر</th>
+                                            <th>کد ملی</th>
+                                            <th>IP</th>
+                                            <th>صفحه</th>
+                                            <th>نوع رویداد</th>
+                                            <th>تاریخ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (visitLogs == null)
+                                        {
+                                            <tr>
+                                                <td colspan="6" class="text-center text-muted py-4">
+                                                    <i class="fas fa-spinner fa-spin"></i> در حال بارگذاری...
+                                                </td>
+                                            </tr>
+                                        }
+                                        else if (!visitLogs.Items.Any())
+                                        {
+                                            <tr>
+                                                <td colspan="6" class="text-center text-muted py-4">
+                                                    هیچ لاگی ثبت نشده است
+                                                </td>
+                                            </tr>
+                                        }
+                                        else
+                                        {
+                                            @foreach (var log in visitLogs.Items)
+                                            {
+                                                <tr>
+                                                    <td>@log.UserName</td>
+                                                    <td>@log.Codeid</td>
+                                                    <td>
+                                                        <code>@log.Ip</code>
+                                                    </td>
+                                                    <td>@log.Page</td>
+                                                    <td>
+                                                        @if (log.EventType == "enter")
+                                                        {
+                                                            <span class="badge badge-success">ورود</span>
+                                                        }
+                                                        else if (log.EventType == "leave")
+                                                        {
+                                                            <span class="badge badge-danger">خروج</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="badge badge-secondary">@log.EventType</span>
+                                                        }
+                                                    </td>
+                                                    <td dir="ltr" class="text-left">
+                                                        @log.Timestamp?.ToLocalTime().ToString("yyyy/MM/dd HH:mm")
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
     </div>
-</section>
+</div>
 
 @code {
     private DashboardOverview? overview;
@@ -135,8 +188,14 @@
 
     protected override async Task OnInitializedAsync()
     {
-        overview = await Http.GetFromJsonAsync<DashboardOverview>("api/dashboard/overview");
-        visitLogs =await Logger.GetAllLogAsync(null,null);
-
+        try
+        {
+            overview = await Http.GetFromJsonAsync<DashboardOverview>("api/dashboard/overview");
+            visitLogs = await Logger.GetAllLogAsync(null, null);
+        }
+        catch (Exception ex)
+        {
+            
+        }
     }
 }

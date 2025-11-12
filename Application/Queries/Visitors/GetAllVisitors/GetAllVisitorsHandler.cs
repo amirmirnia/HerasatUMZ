@@ -1,4 +1,5 @@
 ﻿using Application.Common.Interfaces;
+using Application.DTOs;
 using Application.DTOs.Visitor;
 using AutoMapper;
 using MediatR;
@@ -6,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Queries.Visitors.GetAllVisitors
 {
-    public class GetAllVisitorsHandler : IRequestHandler<GetAllVisitorsQueryHandler, List<VisitorVM>>
+    public class GetAllVisitorsHandler : IRequestHandler<GetAllVisitorsQueryHandler, PagedResult<VisitorVM>>
     {
         private readonly IApplicationDbContext _context;
         private readonly IMapper _mapper;
@@ -17,11 +18,11 @@ namespace Application.Queries.Visitors.GetAllVisitors
             _mapper = mapper;
         }
 
-        public async Task<List<VisitorVM>> Handle(GetAllVisitorsQueryHandler request, CancellationToken cancellationToken)
+        public async Task<PagedResult<VisitorVM>> Handle(GetAllVisitorsQueryHandler request, CancellationToken cancellationToken)
         {
             var query = _context.Visitors.Include(x=>x.Vehicles)
                 .AsNoTracking()
-                .Where(v => v.IsInside == request.IsInside);
+                .Where(v => v.IsInside == request.IsInside).AsQueryable();
 
             // 🔍 جستجو بر اساس نام، کد ملی یا میزبان
             if (!string.IsNullOrWhiteSpace(request.searchQuery))
@@ -52,11 +53,34 @@ namespace Application.Queries.Visitors.GetAllVisitors
                 query = query.Where(v => v.RegisterDateTime <= request.ExitTime.Value);
             }
 
+
+            var pageNumber = request.pageNumber ?? 1;
+            var pageSize = request.pageSize ?? 10;
+
+            var totalCount = await query.CountAsync(cancellationToken);
+
+            var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+            if (pageNumber > totalPages && totalPages > 0)
+                pageNumber = totalPages;
+            else if (totalPages == 0)
+                pageNumber = 1;
+
+
+
+
+
             var visitors = await query
-                .OrderByDescending(v => v.RegisterDateTime)
+                .OrderByDescending(v => v.CreatedDate)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync(cancellationToken);
 
-            return _mapper.Map<List<VisitorVM>>(visitors);
+
+            return new PagedResult<VisitorVM>
+            {
+                Items = _mapper.Map<List<VisitorVM>>(visitors),
+                TotalCount = totalCount
+            };
         }
     }
 }

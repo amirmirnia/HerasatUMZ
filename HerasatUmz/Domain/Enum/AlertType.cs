@@ -6,11 +6,8 @@ using System.Threading.Tasks;
 
 namespace Domain.Enum
 {
-    public enum ToastType
+    public enum AlertType
     {
-        Success,
-        Error,
-        Warning,
-        Info
+        Success, Warning, Error, Info
     }
 }

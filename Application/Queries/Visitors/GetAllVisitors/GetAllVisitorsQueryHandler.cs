@@ -1,4 +1,5 @@
-﻿using Application.DTOs.Visitor;
+﻿using Application.DTOs;
+using Application.DTOs.Visitor;
 using Domain.Enums;
 using MediatR;
 using System;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Application.Queries.Visitors.GetAllVisitors
 {
-    public class GetAllVisitorsQueryHandler : IRequest<List<VisitorVM>>
+    public class GetAllVisitorsQueryHandler : IRequest<PagedResult<VisitorVM>>
     {
         public bool IsInside { get; set; }
         public string searchQuery { get; set; }
@@ -22,6 +23,8 @@ namespace Application.Queries.Visitors.GetAllVisitors
         public string? PlatePart3 { get; set; }
         public string? PlatePart4 { get; set; }
         public string? PhotovehiclePath { get; set; }
+        public int? pageSize { get; set; }
+        public int? pageNumber { get; set; }
 
     }
 }

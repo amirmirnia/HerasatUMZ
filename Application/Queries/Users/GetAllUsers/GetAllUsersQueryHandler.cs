@@ -55,17 +55,14 @@ public class GetAllUsersQueryHandler : IRequestHandler<GetAllUsersQuery, PagedRe
         var pageNumber = request.pageNumber ?? 1;
         var pageSize = request.pageSize ?? 10;
 
-        // ----- ????? ?? -----
         var totalCount = await query.CountAsync(cancellationToken);
 
-        // ??????? ?? ???? ???? ??? ?? ?????
         var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
         if (pageNumber > totalPages && totalPages > 0)
             pageNumber = totalPages;
         else if (totalPages == 0)
             pageNumber = 1;
 
-        // ----- ????????? ? ????????? -----
         var users = await query
             .OrderByDescending(u => u.CreatedDate)
             .ThenBy(u => u.FirstName)

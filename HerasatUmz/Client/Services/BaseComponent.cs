@@ -1,9 +1,11 @@
 ﻿using Blazored.LocalStorage;
+using Client.Services.Alert;
 using Client.Services.Interface;
 using Domain.Enum;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.JSInterop;
 using System.Globalization;
 using System.Security.Claims;
@@ -19,14 +21,16 @@ namespace Client.Services
         [Inject] protected AuthenticationStateProvider AuthStateProvider { get; set; } = default!;
         [Inject] protected UserContextService UserContext { get; set; } = default!;
         [Inject] protected IVisitLogger Logger { get; set; } = default!;
+        [Inject] protected AlertService _AlertService { get; set; } = default!;
 
-        public ToastType toastType = ToastType.Warning;
+
 
         protected HubConnection? hubConnection;
 
         protected readonly string hubUrl = "https://localhost:7224/hubs/visitors";
         protected readonly string baseUrl = "https://localhost:7224";
         protected AuthenticationState authState { get; set; }
+        public AlertType toastType = AlertType.Warning;
         private string? role;
         private string? name;
         private string? idCode;
@@ -42,7 +46,8 @@ namespace Client.Services
         protected override async Task OnInitializedAsync()
         {
             authState = await AuthStateProvider.GetAuthenticationStateAsync(); // Fixed here
-            
+
+            await TryShowToastFromQueryString();
             await UserContext.InitializeAsync();
             await InitHubAsync();
             await base.OnInitializedAsync();
@@ -64,6 +69,27 @@ namespace Client.Services
             }
         }
 
+        protected async Task TryShowToastFromQueryString()
+        {
+            var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
+
+            if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("toastMessage", out var msg))
+            {
+
+                if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("toastType", out var type))
+                {
+                    if (Enum.TryParse<AlertType>(type, true, out var parsedType))
+                    {
+                        toastType = parsedType;
+                    }
+                }
+
+                _AlertService.Show(msg, null, toastType);
+
+                // اختیاری: پاک کردن کوئری استرینگ بدون رفرش
+
+            }
+        }
 
         protected async ValueTask DisposeAsync()
         {

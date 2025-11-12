@@ -52,7 +52,9 @@ public class VisitorsController : BaseApiController
                 IsInside = model.IsInside,
                 searchQuery= model.searchQuery,
                 EnterTime= model.EnterTime,
-                ExitTime=model.ExitTime
+                ExitTime=model.ExitTime,
+                pageNumber= model.pageNumber,
+                pageSize = model.pageSize
 
             };
             var result = await Mediator.Send(query);

@@ -4,13 +4,7 @@
 @inherits BaseComponent
 <PageTitle>ویرایش کاربر</PageTitle>
 
-@if (!string.IsNullOrEmpty(errorMessage))
-{
-    <div class="callout callout-danger">
-        <h5><i class="fas fa-exclamation-triangle"></i> خطا</h5>
-        <p>@errorMessage</p>
-    </div>
-}
+
 @{
     if (user != null)
     {
@@ -205,7 +199,7 @@
                             </div>
 
                             <div class="text-right mt-4">
-                                <button type="button" class="btn btn-flat btn-secondary" @onclick="NavigateToUserList">
+                                <button type="button" class="btn btn-outline-secondary btn-flat" @onclick="NavigateToUserList">
                                     انصراف
                                 </button>
                                 <button type="button" class="btn btn-flat btn-primary ml-2" @onclick="NextStep">
@@ -246,7 +240,7 @@
                             </div>
 
                             <div class="text-right mt-4">
-                                <button type="button" class="btn btn-flat btn-secondary" @onclick="PreviousStep">
+                                <button type="button" class="btn btn-outline-secondary btn-flat" @onclick="PreviousStep">
                                     <i class="fas fa-arrow-right mr-2"></i> قبلی
                                 </button>
                                 <button type="button" class="btn btn-flat btn-primary ml-2" @onclick="NextStep">
@@ -296,7 +290,7 @@
                             </div>
 
                             <div class="text-right mt-4">
-                                <button type="button" class="btn btn-flat btn-secondary" @onclick="PreviousStep">
+                                <button type="button" class="btn btn-outline-secondary btn-flat" @onclick="PreviousStep">
                                     <i class="fas fa-arrow-right mr-2"></i> قبلی
                                 </button>
                                 <button type="submit" class="btn btn-success btn-lg ml-3" disabled="@isSubmitting">
@@ -306,9 +300,9 @@
                                     }
                                     else
                                     {
-                                        <i class="fas fa-save"></i>
- 
-                                                    }
+                                        <span>ویرایش</span>
+
+                                    }
                                 </button>
                             </div>
                         </div>
@@ -340,7 +334,6 @@
     private bool isSubmitting = false;
     private bool showSuccessMessage = false;
     private int currentStep = 1;
-    private string errorMessage = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -375,12 +368,14 @@
             }
             else
             {
-                errorMessage = "کاربر یافت نشد.";
+                _AlertService.Show("کاربر یافت نشد.", "هشدار", AlertType.Error);
+
             }
         }
         catch (Exception ex)
         {
-            errorMessage = "خطا در بارگذاری: " + ex.Message;
+            _AlertService.Show("خطا در بارگذاری: ", "هشدار", AlertType.Error);
+
         }
         finally
         {
@@ -410,16 +405,19 @@
             {
                 showSuccessMessage = true;
                 await Task.Delay(1500);
-                Navigation.NavigateTo("/panel/users");
+                Navigation.NavigateTo("/panel/users?toastMessage=کاربر با موفقیت ویرایش شد&toastType=Success");
             }
             else
             {
-                errorMessage = await res.Content.ReadAsStringAsync();
+
+                _AlertService.Show(await res.Content.ReadAsStringAsync(), "هشدار", AlertType.Error);
+
             }
         }
         catch (Exception ex)
         {
-            errorMessage = "خطا در ارتباط با سرور: " + ex.Message;
+            _AlertService.Show("خطا در ارتباط با سرور: ", "هشدار", AlertType.Error);
+
         }
         finally
         {

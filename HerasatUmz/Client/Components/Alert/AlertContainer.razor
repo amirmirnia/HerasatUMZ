@@ -1,0 +1,44 @@
+﻿@using Application.DTOs.More
+@using Client.Services.Alert
+@inject AlertService AlertService
+@implements IDisposable
+
+@foreach (var alert in alerts)
+{
+    <Alert Type="alert.Type" Title="alert.Title" OnClose="() => Remove(alert.Id)">
+        @alert.Message
+    </Alert>
+}
+
+@code {
+    private List<AlertModel> alerts = new();
+    private int idCounter = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        AlertService.OnShow += OnAlertShow;
+
+    }
+
+    private void OnAlertShow(string message, string title, AlertType type)
+    {
+        alerts.Add(new AlertModel
+        {
+            Id = ++idCounter,
+            Message = message,
+            Title = title,
+            Type = type
+        });
+        StateHasChanged();
+    }
+
+    private void Remove(int id)
+    {
+        alerts.RemoveAll(a => a.Id == id);
+        StateHasChanged();
+    }
+
+    public void Dispose() => AlertService.OnShow -= OnAlertShow;
+
+
+}

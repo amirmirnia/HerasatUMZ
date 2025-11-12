@@ -1,5 +1,4 @@
 ﻿.license-plate {
-    width: 420px;
     height: 110px;
     background: white;
     border: 2px solid #000;
@@ -8,7 +7,6 @@
     box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     overflow: hidden;
     z-index: 100000;
-    position: fixed;
 }
 
 .left-section {
@@ -20,7 +18,6 @@
     align-items: center;
     justify-content: space-between;
     padding: 8px 0;
-    border-right: 2px solid #000;
 }
 
 .flag {
@@ -61,7 +58,7 @@
     justify-content: center;
     background: white;
     position: relative;
-    border-left: 2px solid;
+    border-right: 2px solid;
 }
 
 .numbers {
@@ -73,9 +70,34 @@
     direction: ltr;
 }
 
-    .numbers .digit {
-        text-align: center;
-    }
+.right-section .code input {
+    width: 3em;
+    font-size: smaller;
+    border: 0;
+}
+
+.numbers .digit input :focus-visible{
+    outline:0;
+}
+.numbers .digit input :focus {
+    outline: 0;
+}
+.numbers .digit input {
+    width: 3em;
+    font-size: smaller;
+    border: 0;
+}
+.numbers  .letter select {
+    height: 100%;
+    font-size: smaller;
+    border: 0;
+}
+.license-plate-container {
+    width: max-content;
+}
+.numbers .digit {
+    text-align: center;
+}
 
     .numbers .letter {
         font-size: 48px;
@@ -84,7 +106,6 @@
 .right-section {
     width: 90px;
     background: white;
-    border-left: 2px solid #000;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -110,15 +131,16 @@
         border-radius: 6px;
         padding: 8px;
         position: absolute;
-        z-index: 1000;
-        bottom: 125%; /* بالای آیکون */
+        z-index: 10000000;
+        z-index: 10000000;
+        /* bottom: 125%; */
         left: 50%;
         margin-left: -60px;
-        width: 180px;
+        /* width: 180px; */
         opacity: 0;
         transition: opacity 0.3s;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        pointer-events: none; /* برای جلوگیری از تداخل ماوس */
+        /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); */
+        pointer-events: none;
     }
 
         .plate-tooltip .tooltiptext::after {
@@ -194,4 +216,9 @@
         transform: scale(1);
         opacity: 1;
     }
+}
+
+
+.nav-link {
+    direction: rtl;
 }
