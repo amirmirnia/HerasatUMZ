@@ -4,12 +4,14 @@
 @inject HttpClient Http
 @inject UserContextService UserContext
 @using Client.Components.Alert
+@using Client.Services.Log
 @using Microsoft.AspNetCore.Components.Authorization
 @inject AuthenticationStateProvider AuthStateProvider
 
 
 
 <AlertContainer />
+<VisitTracker />
 <body class="hold-transition sidebar-mini">
     <div class="wrapper">
         <!-- Navbar -->

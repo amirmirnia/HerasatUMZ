@@ -27,7 +27,7 @@ namespace Client.Services
 
         protected HubConnection? hubConnection;
 
-        protected readonly string hubUrl = "https://localhost:7224/hubs/visitors";
+        protected string hubUrl => Navigation.ToAbsoluteUri("/hubs/visitors").ToString();
         protected readonly string baseUrl = "https://localhost:7224";
         protected AuthenticationState authState { get; set; }
         public AlertType toastType = AlertType.Warning;

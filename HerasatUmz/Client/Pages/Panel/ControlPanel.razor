@@ -191,7 +191,7 @@
         try
         {
             overview = await Http.GetFromJsonAsync<DashboardOverview>("api/dashboard/overview");
-            visitLogs = await Logger.GetAllLogAsync(null, null);
+            visitLogs = await Logger.GetAllLogAsync(null, null,null);
         }
         catch (Exception ex)
         {

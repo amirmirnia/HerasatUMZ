@@ -14,7 +14,7 @@ namespace Server.Controllers
     [ApiController]
     [EnableCors("AllowBlazor")]
     [Route("api/[controller]")]
-    [Authorize]
+
 
     public class VisitController : BaseApiController
     {

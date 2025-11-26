@@ -1,13 +1,8 @@
-﻿
-using Application.DTOs;
+﻿using Application.DTOs;
 using Application.DTOs.Log;
-using Application.DTOs.Visitor;
 using Client.Services.Interface;
-using Domain.Entities.Log;
 using Microsoft.AspNetCore.Components;
-using System.Net.Http;
 using System.Net.Http.Json;
-using static System.Net.WebRequestMethods;
 
 
 namespace Client.Services.Repository
@@ -42,7 +37,7 @@ namespace Client.Services.Repository
            
         }
 
-        public async Task<PagedResult<VisitLogResponseDto>> GetAllLogAsync(int? pageNumber, int? pageSize)
+        public async Task<PagedResult<VisitLogResponseDto>> GetAllLogAsync(int? pageNumber, int? pageSize, string? CodeId)
         {
             var visitLogs=new PagedResult<VisitLogResponseDto>();
             try
@@ -52,6 +47,20 @@ namespace Client.Services.Repository
             catch
             {
                 
+            }
+            return visitLogs;
+        }
+
+        public async Task<PagedResult<VisitLogResponseDto>> GetAllLogUserAsync(int? pageNumber, int? pageSize)
+        {
+            var visitLogs = new PagedResult<VisitLogResponseDto>();
+            try
+            {
+                visitLogs = await http.GetFromJsonAsync<PagedResult<VisitLogResponseDto>>($"api/visit/GetAllLogUser?pageNumber={pageNumber} & pageSize={pageSize}");
+            }
+            catch
+            {
+
             }
             return visitLogs;
         }

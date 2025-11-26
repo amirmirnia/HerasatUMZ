@@ -8,6 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Pages\Panel\Share\**" />
+    <Content Remove="Pages\Panel\Share\**" />
+    <EmbeddedResource Remove="Pages\Panel\Share\**" />
+    <None Remove="Pages\Panel\Share\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
     <PackageReference Include="Lucide.Blazor.Generator" Version="1.1.2" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="9.0.10" />
@@ -24,10 +31,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Application\Application.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Pages\Panel\Share\" />
   </ItemGroup>
 
 </Project>
