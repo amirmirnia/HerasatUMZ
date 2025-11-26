@@ -15,6 +15,7 @@ namespace Server.Controllers
 {
     [ApiController]
     [Route("api/auth")]
+
     public class AuthController : BaseApiController
     {
         private readonly ITokenService _tokenService;

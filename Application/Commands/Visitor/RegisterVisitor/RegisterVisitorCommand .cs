@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Application.Commands.Visitor.RegisterVisitor
 {
-    public class RegisterVisitorCommand : IRequest<VisitorDto>
+    public class RegisterVisitorCommand : IRequest<VisitorVM>
     {
         public string FullName { get; set; } = string.Empty;
         public string NationalCode { get; set; } = string.Empty;

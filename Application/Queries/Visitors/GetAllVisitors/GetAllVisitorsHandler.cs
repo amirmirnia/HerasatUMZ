@@ -24,7 +24,6 @@ namespace Application.Queries.Visitors.GetAllVisitors
                 .AsNoTracking()
                 .Where(v => v.IsInside == request.IsInside).AsQueryable();
 
-            // 🔍 جستجو بر اساس نام، کد ملی یا میزبان
             if (!string.IsNullOrWhiteSpace(request.searchQuery))
             {
                 var keyword = request.searchQuery.Trim();
@@ -34,7 +33,6 @@ namespace Application.Queries.Visitors.GetAllVisitors
                     v.HostName.Contains(keyword));
             }
 
-            // ⏰ فیلتر بازه زمانی
             if (request.EnterTime.HasValue && request.ExitTime.HasValue)
             {
                 var start = request.EnterTime.Value.Date;

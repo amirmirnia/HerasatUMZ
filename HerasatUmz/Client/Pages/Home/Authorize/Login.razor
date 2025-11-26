@@ -70,7 +70,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await base.OnInitializedAsync();
+         await base.OnInitializedAsync();
         if (authState.User.Identity?.IsAuthenticated == true)
         {
             Navigation.NavigateTo($"/Panel",true);

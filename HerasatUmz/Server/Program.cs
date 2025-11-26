@@ -31,7 +31,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection") ??
-        "Server=(LocalDB)\\MSSQLLocalDB;Database=ReservationManagement;Trusted_Connection=true;MultipleActiveResultSets=true"));
+        "Server=.;Database=HerasatUmz;Trusted_Connection=true;MultipleActiveResultSets=true;TrustServerCertificate=True"));
 
 // Register Application DbContext Interface
 builder.Services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
@@ -93,29 +93,30 @@ builder.Services.AddAuthorization();
 
 
 // Add CORS
+var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
+
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowBlazorClient",
-        policy =>
-        {
-            policy.WithOrigins("https://localhost:7224") // frontend
-                  .AllowAnyHeader()
-                  .AllowAnyMethod()
-                  .AllowCredentials(); // این باعث می‌شود کوکی‌ها فرستاده شوند
-        });
+    options.AddPolicy("AllowBlazorClient", policy =>
+    {
+        policy.WithOrigins(
+                "https://localhost:7224"
+            )
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
 });
 
 
 
 var app = builder.Build();
 
-
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new PhysicalFileProvider(
-        Path.Combine(builder.Environment.ContentRootPath, "uploadsImageRoom")),
-    RequestPath = "/uploadsImageRoom"
-});
+#region Creatfile
+    Directory.CreateDirectory(Path.Combine(app.Environment.WebRootPath!, "uploads"));
+    Directory.CreateDirectory(Path.Combine(app.Environment.WebRootPath!, "uploads/Vehiclevisitors"));
+    Directory.CreateDirectory(Path.Combine(app.Environment.WebRootPath!, "uploads/visitors"));
+#endregion
 
 
 

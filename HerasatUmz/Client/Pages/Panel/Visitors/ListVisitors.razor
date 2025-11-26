@@ -7,7 +7,7 @@
 
 <ConfirmModal @ref="confirmModal" OnClose="HandleConfirmResult" />
 <ImageModal @ref="imageModal" OnClose="() => StateHasChanged()" />
-    
+
 
 
 <section class="content-header">
@@ -43,7 +43,7 @@
                                     <span class="input-group-text"><i class="fas fa-search"></i></span>
                                 </div>
                                 <input type="text" class="form-control" placeholder="نام، کد ملی یا ملاقات‌شونده..."
-                                @bind="searchQuery" @bind:event="oninput" @bind:after="LoadVisitors" />
+                                       @bind="searchQuery" @bind:event="oninput" @bind:after="LoadVisitors" />
                             </div>
                         </div>
                     </div>
@@ -95,9 +95,9 @@
                                 <tr>
                                     <td>
                                         <img src="@GetVisitorImage(v.PhotoPath)"
-                                        class="img-circle elevation-2"
-                                        alt="@v.FullName"
-                                        style="width:50px;height:50px;object-fit:cover;" />
+                                             class="img-circle elevation-2"
+                                             alt="@v.FullName"
+                                             style="width:50px;height:50px;object-fit:cover;" />
                                     </td>
                                     <td><strong>@v.FullName</strong></td>
                                     <td>@v.NationalCode</td>
@@ -173,6 +173,7 @@
 @code {
     private PagedResult<VisitorVM>? Allvisitor;
     private List<VisitorVM> visitors = new();
+
     private ConfirmModal? confirmModal;
     private int pendingVisitorId;
     private string pendingVisitorName = "";
@@ -193,10 +194,12 @@
         await LoadVisitors();
         await JSRuntime.InvokeVoidAsync("jalaliDatepicker.startWatch");
         // SignalR: ورود جدید
-        hubConnection.On<VisitorVM>("VisitorRegistered", visitor =>
+
+
+        hubConnection.On<VisitorVM>("VisitorRegistered", id =>
         {
-            visitors ??= new();
-            visitors.Insert(0, visitor);
+            _AlertService.Show($"{id.FullName} وارد سازمان شد", "موفقیت", AlertType.Success);
+            visitors.Insert(0, id);
             StateHasChanged();
         });
 
@@ -211,7 +214,7 @@
             }
         });
 
-        
+
     }
 
     private async Task LoadVisitors()
@@ -267,7 +270,7 @@
 
 
     private void ConfirmExit(int id, string name)
-   {
+    {
         pendingVisitorId = id;
         pendingVisitorName = name;
         confirmModal?.Show("تأیید خروج", $"آیا از خروج {name}اطمینان دارید؟");

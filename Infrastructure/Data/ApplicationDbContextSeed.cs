@@ -13,9 +13,10 @@ public static class ApplicationDbContextSeed
     public static async Task SeedAsync(ApplicationDbContext context, ILogger<ApplicationDbContext> logger, IPasswordHasher passwordHasher)
     {
         try
+
         {
             // Ensure database is created
-            await context.Database.EnsureCreatedAsync();
+            await context.Database.MigrateAsync();
             
             // Seed default users
             await SeedUsersAsync(context, logger, passwordHasher);

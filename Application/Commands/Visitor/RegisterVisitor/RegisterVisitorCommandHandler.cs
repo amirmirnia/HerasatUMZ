@@ -10,7 +10,7 @@ using Application.Services.Image;
 
 namespace Application.Commands.Visitor.RegisterVisitor;
 
-public class RegisterVisitorCommandHandler : IRequestHandler<RegisterVisitorCommand, VisitorDto>
+public class RegisterVisitorCommandHandler : IRequestHandler<RegisterVisitorCommand, VisitorVM>
 {
     private readonly IApplicationDbContext _context;
     private readonly IMapper _mapper;
@@ -22,7 +22,7 @@ public class RegisterVisitorCommandHandler : IRequestHandler<RegisterVisitorComm
         _currentUser = currentUser;
     }
 
-    public async Task<VisitorDto> Handle(RegisterVisitorCommand request, CancellationToken cancellationToken)
+    public async Task<VisitorVM> Handle(RegisterVisitorCommand request, CancellationToken cancellationToken)
     {
         // بررسی وجود بازدیدکننده داخل سازمان
         var exists = await _context.Visitors.Include(x=>x.Vehicles)
@@ -85,6 +85,6 @@ public class RegisterVisitorCommandHandler : IRequestHandler<RegisterVisitorComm
             await _context.SaveChangesAsync(cancellationToken);
         }
 
-        return _mapper.Map<VisitorDto>(visitor);
+        return _mapper.Map<VisitorVM>(visitor);
     }
 }
