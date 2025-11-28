@@ -35,13 +35,13 @@ namespace Client.Services
         private string? name;
         private string? idCode;
 
-        //protected string SetImgRoom(string fileName)
-        //{
-        //    if (string.IsNullOrEmpty(fileName))
-        //        return $"{baseUrl}/images/default-avatar.png";
+        protected string SetImgRoom(string fileName)
+        {
+            if (string.IsNullOrEmpty(fileName))
+                return $"{baseUrl}/images/default-avatar.png";
 
-        //    return $"{baseUrl}/uploadsImageRoom/{fileName}";
-        //}
+            return $"{baseUrl}/uploadsImageRoom/{fileName}";
+        }
 
         protected override async Task OnInitializedAsync()
         {
