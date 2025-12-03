@@ -5,7 +5,9 @@
 
 @foreach (var alert in alerts)
 {
-    <Alert Type="@alert.Type" Title="@alert.Title" OnClose="() => Remove(alert.Id)">
+    <Alert Type="@alert.Type"
+           Title="@alert.Title"
+           OnClose="() => Remove(alert.Id)">
         @alert.Message
     </Alert>
 }
@@ -14,22 +16,35 @@
     private List<AlertModel> alerts = new();
     private int idCounter = 0;
 
+    // زمان به ثانیه (اینجا ۵ ثانیه)
+    private const int AutoCloseDelay = 5000;
+
     protected override async Task OnInitializedAsync()
     {
         AlertService.OnShow += OnAlertShow;
-
     }
 
-    private void OnAlertShow(string message, string title, AlertType type)
+    private async void OnAlertShow(string message, string title, AlertType type)
     {
-        alerts.Add(new AlertModel
-        {
-            Id = ++idCounter,
-            Message = message,
-            Title = title,
-            Type = type
-        });
+        var alert = new AlertModel
+            {
+                Id = ++idCounter,
+                Message = message,
+                Title = title,
+                Type = type
+            };
+
+        alerts.Add(alert);
         StateHasChanged();
+
+        // خودکار حذف کردن بعد از زمان مشخص شده
+        _ = Task.Delay(AutoCloseDelay).ContinueWith(_ =>
+        {
+            InvokeAsync(() =>
+            {
+                Remove(alert.Id);
+            });
+        });
     }
 
     private void Remove(int id)
@@ -38,7 +53,8 @@
         StateHasChanged();
     }
 
-    public void Dispose() => AlertService.OnShow -= OnAlertShow;
-
-
+    public void Dispose()
+    {
+        AlertService.OnShow -= OnAlertShow;
+    }
 }

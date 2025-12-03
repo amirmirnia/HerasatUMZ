@@ -25,8 +25,10 @@ public class GetAllOverviewDashboardQueryHandler : IRequestHandler<GetAllOvervie
         {
             ActiveUsers =await _context.Users.Where(p => p.IsActive).CountAsync(),
             TotalUsers= await _context.Users.CountAsync(),
+            AllVisitors = await _context.Visitors.CountAsync(),
+            AllVisitorsInArea = await _context.Visitors.Where(p=>p.IsInside).CountAsync(),
 
-           
+
 
         };
     }

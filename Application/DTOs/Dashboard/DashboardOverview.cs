@@ -10,5 +10,8 @@ namespace Application.DTOs.Dashboard
     {
         public int TotalUsers { get; set; }
         public int ActiveUsers { get; set; }
+        public int AllVisitors { get; set; }
+        public int AllVisitorsInArea { get; set; }
+
     }
 }
