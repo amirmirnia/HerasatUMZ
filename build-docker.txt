@@ -1,0 +1,27 @@
+docker build -t herasatumz-app:latest .  ساخت ایمیج
+docker run -d -p 8080:80 --name herasatumz-test herasatumz-app:latest  اجرا با نام کانینر و نام ایمیج  
+
+
+
+
+//ssl
+dotnet dev-certs https --clean
+dotnet dev-certs https --trust
+dotnet dev-certs https -ep aspnetapp.pfx -p Qazwqazw@mir01
+این کار باعث ایجاد یک فایل prfx می شه و با ید در کنار داکر بزاری
+و در داکر قرار بدی
+
+
+////////////////////////////
+پاک کردن داکر با نام قبلی
+
+# اول متوقف کن (اگر در حال اجرا باشه)
+docker stop herasatumz-test
+
+# بعد پاک کن
+docker rm herasatumz-test
+
+
+
+# حالا دوباره اجرا کن
+docker run -d -p 8080:80 -p 8443:443 --name herasatumz-test herasatumz-app:latest

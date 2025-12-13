@@ -42,7 +42,7 @@ public class RegisterVisitorCommandHandler : IRequestHandler<RegisterVisitorComm
             PhoneNumber = request.PhoneNumber,
             HostName = request.HostName,
             GuidCode = Guid.NewGuid().ToString("N")[..10],
-            RegisterDateTime = DateTime.UtcNow,
+            RegisterDateTime = DateTime.Now,
             IsActive = true,
             IsInside = true,
             PhotoPath = null 
