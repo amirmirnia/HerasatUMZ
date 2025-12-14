@@ -27,7 +27,7 @@ namespace Application.Commands.Visitor.ExitVisitor
                 throw new Exception("ملاقات‌شونده یافت نشد.");
 
             visitor.IsInside = false;
-            visitor.ExitDateTime = DateTime.UtcNow;
+            visitor.ExitDateTime = DateTime.Now;
 
             await _context.SaveChangesAsync(cancellationToken);
             return true;
