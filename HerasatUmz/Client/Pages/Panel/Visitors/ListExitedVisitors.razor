@@ -122,6 +122,7 @@
                                 <th>شماره تماس</th>
                                 <th>زمان ورود</th>
                                 <th>زمان خروج</th>
+                                <th>ثبت توسط</th>
                                 <th>عملیات</th>
                             </tr>
                         </thead>
@@ -161,6 +162,16 @@
                                     <td dir="ltr">@v.PhoneNumber</td>
                                     <td>@v.RegisterDateTime.ToPeString("yyyy/MM/dd - HH:mm")</td>
                                     <td>@v.ExitDateTime?.ToPeString("yyyy/MM/dd - HH:mm")</td>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(v.RegisteredByName))
+                                        {
+                                            <span class="badge badge-secondary">@v.RegisteredByName</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">—</span>
+                                        }
+                                    </td>
                                     <td>
                                         @{
                                             if (!string.IsNullOrEmpty(v.Vehicles.PlatePart1))

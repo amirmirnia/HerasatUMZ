@@ -34,17 +34,8 @@ namespace Server.Controllers
                 Timestamp = dto.Timestamp ?? DateTime.Now
             };
 
-            try
-            {
-                var result = await Mediator.Send(command);
-                return Ok(result);
-
-            }
-            catch (Exception ex)
-            {
-                //_log.LogError(ex, "Error logging visit");
-                return StatusCode(500, new { success = false, message = "Error logging visit" });
-            }
+            var result = await Mediator.Send(command);
+            return Ok(result);
         }
 
         [HttpGet]

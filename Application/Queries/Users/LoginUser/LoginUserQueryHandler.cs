@@ -3,12 +3,8 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Application.Common.Interfaces;
 using Application.DTOs.User;
-using System.Security.Cryptography;
-using System.Text;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using Microsoft.IdentityModel.Tokens;
 using Application.DTOs.User.Auth;
+using Domain.Entities.Users;
 
 namespace Application.Queries.Users.LoginUser;
 
@@ -19,9 +15,11 @@ public class LoginUserQueryHandler : IRequestHandler<LoginUserQuery, LoginRespon
     private readonly IPasswordHasher _passwordHasher;
     private readonly ITokenService _tokenService;
 
-
-
-    public LoginUserQueryHandler(IApplicationDbContext context, IMapper mapper, IPasswordHasher passwordHasher, ITokenService tokenService)
+    public LoginUserQueryHandler(
+        IApplicationDbContext context,
+        IMapper mapper,
+        IPasswordHasher passwordHasher,
+        ITokenService tokenService)
     {
         _context = context;
         _mapper = mapper;
@@ -31,31 +29,34 @@ public class LoginUserQueryHandler : IRequestHandler<LoginUserQuery, LoginRespon
 
     public async Task<LoginResponseDto> Handle(LoginUserQuery request, CancellationToken cancellationToken)
     {
-        // Find user by email
         var user = await _context.Users
             .FirstOrDefaultAsync(u => u.IdCode == request.CodeId && u.IsActive, cancellationToken);
 
         if (user == null)
-        {
-            throw new UnauthorizedAccessException("Invalid IdCode or password");
-        }
+            throw new UnauthorizedAccessException("کد ملی یا رمز عبور نادرست است.");
 
-        // Verify password
-        var hashedPassword = _passwordHasher.VerifyPassword(request.Password, user.PasswordHash);
-        if (!hashedPassword)
-        {
-            throw new UnauthorizedAccessException("Invalid email or password");
-        }
+        if (!_passwordHasher.VerifyPassword(request.Password, user.PasswordHash))
+            throw new UnauthorizedAccessException("کد ملی یا رمز عبور نادرست است.");
 
-        // Update last login date
         user.LastLoginDate = DateTime.UtcNow;
+
+        var fullName = $"{user.FirstName} {user.LastName}".Trim();
+        var role = user.Role.ToString();
+
+        var access = _tokenService.CreateAccessToken(user.IdCode, fullName, role);
+        var refresh = _tokenService.CreateRefreshToken(user.IdCode, role);
+
+        _context.RefreshTokens.Add(new RefreshToken
+        {
+            TokenHash = _tokenService.HashToken(refresh),
+            UserIdCode = user.IdCode,
+            CreatedAt = DateTime.UtcNow,
+            ExpiresAt = _tokenService.GetRefreshTokenExpiry(),
+            CreatedByIp = request.Ip,
+            UserAgent = request.UserAgent
+        });
+
         await _context.SaveChangesAsync(cancellationToken);
-
-
-
-        // Generate JWT token
-        var access = _tokenService.CreateAccessToken(user.IdCode, user.FirstName + "" + user.LastName,user.Role.ToString());
-        var refresh = _tokenService.CreateRefreshToken(user.IdCode, user.Role.ToString());
 
         return new LoginResponseDto
         {
@@ -63,30 +64,5 @@ public class LoginUserQueryHandler : IRequestHandler<LoginUserQuery, LoginRespon
             Tokenaccess = access,
             Tokenrefresh = refresh,
         };
-    }
-
-
-
-    private static string GenerateJwtToken(Domain.Entities.Users.User user)
-    {
-        var tokenHandler = new JwtSecurityTokenHandler();
-        // Using the same key as configured in Program.cs - in production this should come from IConfiguration
-        var key = Encoding.ASCII.GetBytes("ReservationManagementSecretKey12345678901234567890");
-
-        var tokenDescriptor = new SecurityTokenDescriptor
-        {
-            Subject = new ClaimsIdentity(new[]
-            {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Name, $"{user.FirstName} {user.LastName}"),
-                new Claim(ClaimTypes.Role, user.Role.ToString())
-            }),
-            Expires = DateTime.UtcNow.AddHours(24),
-            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-        };
-
-        var token = tokenHandler.CreateToken(tokenDescriptor);
-        return tokenHandler.WriteToken(token);
     }
 }

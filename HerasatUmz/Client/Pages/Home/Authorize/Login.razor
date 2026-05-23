@@ -97,20 +97,16 @@
             if (response.IsSuccessStatusCode)
             {
                 LoginResponseDto user = await response.Content.ReadFromJsonAsync<LoginResponseDto>();
-
-                // await _localStorage.SetItemAsync("access_token", user.Tokenaccess);
                 Navigation.NavigateTo("/Panel");
             }
             else
             {
-                var text = await response.Content.ReadAsStringAsync();
-                errorMessage = $"مشکل در ورود به سایت";
+                errorMessage = await ApiErrorReader.ReadMessageAsync(response);
             }
         }
-        catch (Exception ex)
+        catch
         {
-            errorMessage = $"سرور-مشکل در ورود به سایت";
-
+            errorMessage = "ارتباط با سرور برقرار نشد.";
         }
         finally
         {

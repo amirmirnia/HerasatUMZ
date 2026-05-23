@@ -21,6 +21,12 @@ namespace Application.DTOs.Visitor
         public bool IsInside { get; set; } = true;
         public DateTime? ExitDateTime { get; set; }
 
+        /// <summary>IdCode of the user who registered this visitor (from CreatedBy audit field).</summary>
+        public string? RegisteredByIdCode { get; set; }
+
+        /// <summary>Display name of the registering user.</summary>
+        public string? RegisteredByName { get; set; }
+
         public VehicleDto Vehicles { get; set; }
     }
 }

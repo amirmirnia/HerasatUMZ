@@ -86,12 +86,14 @@
                                 <th>ملاقات‌شونده</th>
                                 <th>شماره تماس</th>
                                 <th>زمان ورود</th>
+                                <th>ثبت توسط</th>
                                 <th>عملیات</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach (var v in visitors)
                             {
+                                var canExit = CanExitVisitor(v);
                                 <tr>
                                     <td>
                                         <img src="@GetVisitorImage(v.PhotoPath)"
@@ -125,6 +127,16 @@
                                     <td dir="ltr">@v.PhoneNumber</td>
                                     <td>@v.RegisterDateTime.ToPeString("yyyy/MM/dd - HH:mm")</td>
                                     <td>
+                                        @if (!string.IsNullOrEmpty(v.RegisteredByName))
+                                        {
+                                            <span class="badge badge-secondary">@v.RegisteredByName</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">—</span>
+                                        }
+                                    </td>
+                                    <td>
                                         @{
                                             if (!string.IsNullOrEmpty(v.Vehicles.PlatePart1))
                                             {
@@ -135,10 +147,20 @@
                                                 </button>
                                             }
                                         }
-                                        <button class="btn btn-danger btn-sm ml-1"
-                                                @onclick="() => ConfirmExit(v.Id, v.FullName)">
-                                            <i class="fas fa-sign-out-alt"></i> خروج
-                                        </button>
+                                        @if (canExit)
+                                        {
+                                            <button class="btn btn-danger btn-sm ml-1"
+                                                    @onclick="() => ConfirmExit(v.Id, v.FullName)">
+                                                <i class="fas fa-sign-out-alt"></i> خروج
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <button class="btn btn-secondary btn-sm ml-1" disabled
+                                                    title="فقط ثبت‌کننده یا مدیر می‌تواند خروج بزند">
+                                                <i class="fas fa-lock"></i> خروج
+                                            </button>
+                                        }
                                     </td>
                                 </tr>
                             }
@@ -283,9 +305,20 @@
         var response = await Http.PostAsJsonAsync("api/visitors/ExitVisitor", new { Id = pendingVisitorId });
         if (!response.IsSuccessStatusCode)
         {
-            _AlertService.Show("خطا در ثبت خروج", "هشدار", AlertType.Error);
+            var msg = await ApiErrorReader.ReadMessageAsync(response);
+            _AlertService.Show(msg, "هشدار", AlertType.Error);
         }
         // SignalR خودش حذف می‌کند
+    }
+
+    private bool CanExitVisitor(VisitorVM v)
+    {
+        if (UserContext.Role == nameof(UserRole.Admin) ||
+            UserContext.Role == nameof(UserRole.Manager))
+            return true;
+
+        return !string.IsNullOrEmpty(v.RegisteredByIdCode)
+               && string.Equals(v.RegisteredByIdCode, UserContext.NationalCode, StringComparison.Ordinal);
     }
 
     private string GetVisitorImage(string? imagename)

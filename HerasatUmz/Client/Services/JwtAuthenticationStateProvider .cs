@@ -1,57 +1,93 @@
-﻿using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.Authorization;
 using System.Security.Claims;
+using System.Net;
 using System.Net.Http.Json;
 using Application.DTOs.User;
-using System.Data;
 
 namespace Client.Services
 {
     public class JwtAuthenticationStateProvider : AuthenticationStateProvider
     {
-        private readonly HttpClient _httpClient;
+        private readonly IHttpClientFactory _httpClientFactory;
+        private static readonly AuthenticationState Anonymous =
+            new(new ClaimsPrincipal(new ClaimsIdentity()));
 
-        public JwtAuthenticationStateProvider(HttpClient httpClient)
+        public JwtAuthenticationStateProvider(IHttpClientFactory httpClientFactory)
         {
-            _httpClient = httpClient;
+            _httpClientFactory = httpClientFactory;
         }
 
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
             try
             {
-                // درخواست به API برای گرفتن اطلاعات کاربر
-                var userDto = await _httpClient.GetFromJsonAsync<UserDto>("api/auth/me");
+                var client = _httpClientFactory.CreateClient("HerasatUmz.NoAuth");
+
+                var userDto = await TryFetchMeAsync(client);
+                if (userDto == null)
+                {
+                    var refreshed = await TryRefreshAsync(client);
+                    if (refreshed)
+                        userDto = await TryFetchMeAsync(client);
+                }
 
                 if (userDto == null)
-                    return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
+                    return Anonymous;
 
-                // ساخت Claims از اطلاعات کاربر
                 var claims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.Name, userDto.FullName ?? ""),
-                    new Claim(ClaimTypes.NameIdentifier, userDto.IdCode.ToString()),
-                    new Claim("Role", userDto.Role.ToString()),
-                    new Claim(ClaimTypes.Role,userDto.Role.ToString())
+                    new(ClaimTypes.Name, userDto.FullName ?? string.Empty),
+                    new(ClaimTypes.NameIdentifier, userDto.IdCode?.ToString() ?? string.Empty),
+                    new("Role", userDto.Role.ToString()),
+                    new(ClaimTypes.Role, userDto.Role.ToString())
                 };
 
-
                 var identity = new ClaimsIdentity(claims, "cookie");
-                var user = new ClaimsPrincipal(identity);
-
-                return new AuthenticationState(user);
+                return new AuthenticationState(new ClaimsPrincipal(identity));
             }
             catch
             {
-                // اگر کوکی معتبر نبود یا درخواست خطا داد
-                return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
+                return Anonymous;
             }
         }
 
         public void NotifyUserLogout()
         {
-            var anonymous = new ClaimsPrincipal(new ClaimsIdentity());
-            NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(anonymous)));
+            NotifyAuthenticationStateChanged(Task.FromResult(Anonymous));
+        }
+
+        public void NotifyAuthenticationStateChangedExternal()
+        {
+            NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
+        }
+
+        private static async Task<UserDto?> TryFetchMeAsync(HttpClient client)
+        {
+            try
+            {
+                using var resp = await client.GetAsync("api/auth/me");
+                if (resp.StatusCode == HttpStatusCode.Unauthorized || !resp.IsSuccessStatusCode)
+                    return null;
+
+                return await resp.Content.ReadFromJsonAsync<UserDto>();
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private static async Task<bool> TryRefreshAsync(HttpClient client)
+        {
+            try
+            {
+                using var resp = await client.PostAsync("api/auth/refresh", content: null);
+                return resp.IsSuccessStatusCode;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
-
 }

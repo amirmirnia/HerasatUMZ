@@ -26,20 +26,15 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
     public DbSet<Visitor> Visitors => Set<Visitor>();
     public DbSet<Vehicle> Vehicles => Set<Vehicle>();
 
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
-
-
-
-
-
-
-
-
         modelBuilder.ApplyConfiguration(new VisitorConfiguration());
         modelBuilder.ApplyConfiguration(new UserConfiguration());
+        modelBuilder.ApplyConfiguration(new RefreshTokenConfiguration());
     }
 
 

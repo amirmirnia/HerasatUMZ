@@ -1,15 +1,10 @@
-﻿using Application.Common.Interfaces;
-using Domain.Entities.Users;
+using Application.Common.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Infrastructure.Services.Security
 {
@@ -23,20 +18,22 @@ namespace Infrastructure.Services.Security
         private SymmetricSecurityKey GetKey() =>
             new(Encoding.UTF8.GetBytes(_cfg["Jwt:Key"]!));
 
-        public string CreateAccessToken(string userId, string userName, string Role, IEnumerable<Claim>? extra = null)
+        public string CreateAccessToken(string userId, string userName, string role, IEnumerable<Claim>? extra = null)
         {
             var expires = DateTime.UtcNow.AddMinutes(int.Parse(_cfg["Jwt:AccessTokenExpirationMinutes"]!));
             var creds = new SigningCredentials(GetKey(), SecurityAlgorithms.HmacSha256);
             var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.NameIdentifier, userId),
-            new Claim(ClaimTypes.Name, userName ?? string.Empty),
-            new Claim("Role", Role.ToString()),
-            new Claim(ClaimTypes.Role, Role.ToString()),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim("typ", "access")
-        };
+            {
+                new(JwtRegisteredClaimNames.Sub, userId),
+                new(ClaimTypes.NameIdentifier, userId),
+                new(ClaimTypes.Name, userName ?? string.Empty),
+                new(ClaimTypes.Role, role ?? string.Empty),
+                new("Role", role ?? string.Empty),
+                new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new("typ", "access")
+            };
             if (extra != null) claims.AddRange(extra);
+
             var token = new JwtSecurityToken(
                 issuer: _cfg["Jwt:Issuer"],
                 audience: _cfg["Jwt:Audience"],
@@ -47,18 +44,19 @@ namespace Infrastructure.Services.Security
             return _handler.WriteToken(token);
         }
 
-        public string CreateRefreshToken(string userId, string Role)
+        public string CreateRefreshToken(string userId, string role)
         {
             var expires = DateTime.UtcNow.AddDays(int.Parse(_cfg["Jwt:RefreshTokenExpirationDays"]!));
             var creds = new SigningCredentials(GetKey(), SecurityAlgorithms.HmacSha256);
             var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.NameIdentifier, userId),
-            new Claim(ClaimTypes.Role, Role.ToString()),
-             new Claim("Role", Role.ToString()),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim("typ", "refresh")
-        };
+            {
+                new(JwtRegisteredClaimNames.Sub, userId),
+                new(ClaimTypes.NameIdentifier, userId),
+                new(ClaimTypes.Role, role ?? string.Empty),
+                new("Role", role ?? string.Empty),
+                new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new("typ", "refresh")
+            };
             var token = new JwtSecurityToken(
                 issuer: _cfg["Jwt:Issuer"],
                 audience: _cfg["Jwt:Audience"],
@@ -68,6 +66,15 @@ namespace Infrastructure.Services.Security
             );
             return _handler.WriteToken(token);
         }
+
+        public string HashToken(string token)
+        {
+            var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(token));
+            return Convert.ToHexString(bytes);
+        }
+
+        public DateTime GetRefreshTokenExpiry() =>
+            DateTime.UtcNow.AddDays(int.Parse(_cfg["Jwt:RefreshTokenExpirationDays"]!));
 
         public ClaimsPrincipal? ValidateRefreshToken(string refreshToken, out SecurityToken? validatedToken)
         {
@@ -83,13 +90,18 @@ namespace Infrastructure.Services.Security
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = GetKey(),
                     ValidateLifetime = true,
-                    ClockSkew = TimeSpan.FromSeconds(30)
+                    ClockSkew = TimeSpan.FromSeconds(30),
+                    NameClaimType = ClaimTypes.NameIdentifier,
+                    RoleClaimType = ClaimTypes.Role
                 };
                 var principal = _handler.ValidateToken(refreshToken, prms, out validatedToken);
-                // ensure typ == refresh
-                var jwt = validatedToken as JwtSecurityToken;
-                if (jwt == null || jwt.Claims.FirstOrDefault(c => c.Type == "typ")?.Value != "refresh")
+
+                if (validatedToken is not JwtSecurityToken jwt ||
+                    jwt.Claims.FirstOrDefault(c => c.Type == "typ")?.Value != "refresh")
+                {
+                    validatedToken = null;
                     return null;
+                }
                 return principal;
             }
             catch
@@ -99,5 +111,4 @@ namespace Infrastructure.Services.Security
             }
         }
     }
-
 }

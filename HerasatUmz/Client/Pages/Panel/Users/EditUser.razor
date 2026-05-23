@@ -409,15 +409,13 @@
             }
             else
             {
-
-                _AlertService.Show(await res.Content.ReadAsStringAsync(), "هشدار", AlertType.Error);
-
+                var msg = await ApiErrorReader.ReadMessageAsync(res);
+                _AlertService.Show(msg, "هشدار", AlertType.Error);
             }
         }
-        catch (Exception ex)
+        catch
         {
-            _AlertService.Show("خطا در ارتباط با سرور: ", "هشدار", AlertType.Error);
-
+            _AlertService.Show("ارتباط با سرور برقرار نشد.", "هشدار", AlertType.Error);
         }
         finally
         {

@@ -19,7 +19,9 @@ public class MappingProfile : Profile
         CreateMap<User, UserDto>();
         CreateMap<User, UserListDto>();
         CreateMap<Visitor, VisitorDto>();
-        CreateMap<Visitor, VisitorVM>();
+        CreateMap<Visitor, VisitorVM>()
+            .ForMember(d => d.RegisteredByIdCode, o => o.MapFrom(s => s.CreatedBy))
+            .ForMember(d => d.RegisteredByName, o => o.MapFrom(s => s.RegisteredByName));
         CreateMap<VisitLog, VisitLogResponseDto>();
         CreateMap<Vehicle, VehicleDto>();
 

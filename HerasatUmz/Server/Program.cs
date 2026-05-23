@@ -7,12 +7,19 @@ using Application.Common.Behaviours;
 using Application.Common.Mappings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Infrastructure.Services.BackgroundServices;
 using Server.Hubs;
+using Server.Middleware;
+
+// Keep JWT claim names as-issued (sub stays sub, etc.) — the framework default
+// remaps them to long ClaimTypes URIs and breaks token-claim lookups.
+JwtSecurityTokenHandler.DefaultMapInboundClaims = false;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -65,6 +72,7 @@ builder.Services.AddAuthentication(options =>
 {
     options.RequireHttpsMetadata = true;
     options.SaveToken = true;
+    options.MapInboundClaims = false;
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
@@ -74,7 +82,9 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(key),
         ValidateLifetime = true,
-        ClockSkew = TimeSpan.FromSeconds(30)
+        ClockSkew = TimeSpan.FromSeconds(30),
+        NameClaimType = ClaimTypes.NameIdentifier,
+        RoleClaimType = ClaimTypes.Role
     };
 
     // Read token from cookie named "access_token"
@@ -150,12 +160,11 @@ if (app.Environment.IsDevelopment())
 }
 else
 {
-    app.UseExceptionHandler("/Error");
     app.UseHsts();
 }
 
-
-
+// Must run before anything that might throw — catches both pipeline and controller exceptions.
+app.UseGlobalExceptionHandler();
 
 app.UseRouting();
 

@@ -45,7 +45,8 @@ public class RegisterVisitorCommandHandler : IRequestHandler<RegisterVisitorComm
             RegisterDateTime = DateTime.Now,
             IsActive = true,
             IsInside = true,
-            PhotoPath = null 
+            PhotoPath = null,
+            RegisteredByName = _currentUser.UserName
         };
 
         // ذخیره عکس اگر وجود داشته باشه

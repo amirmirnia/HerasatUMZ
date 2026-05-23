@@ -133,6 +133,10 @@
             await Http.PostAsync("api/auth/logout", null);
         }
         catch { /* ignore */ }
-        Navigation.NavigateTo("/");
+
+        if (AuthStateProvider is JwtAuthenticationStateProvider jwtProvider)
+            jwtProvider.NotifyUserLogout();
+
+        Navigation.NavigateTo("/", forceLoad: true);
     }
 }

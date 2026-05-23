@@ -1,13 +1,9 @@
-﻿using MediatR;
+using Application.Common.Interfaces;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Infrastructure.Services.BackgroundServices
 {
@@ -35,11 +31,10 @@ namespace Infrastructure.Services.BackgroundServices
                     var delay = nextRun - now;
                     await Task.Delay(delay, stoppingToken);
                     await RunNightlyTaskAsync(stoppingToken);
-
                 }
                 catch (TaskCanceledException)
                 {
-                    //stop services
+                    // shutting down
                 }
                 catch (Exception ex)
                 {
@@ -50,13 +45,23 @@ namespace Infrastructure.Services.BackgroundServices
 
         private async Task RunNightlyTaskAsync(CancellationToken cancellationToken)
         {
-            using (var scope = _serviceProvider.CreateScope())
-            {
-                var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-                //await mediator.Send(new CheckOutRengeReservtionCommand(), cancellationToken);
-            }
-            // شبیه‌سازی کار زمان‌بر
-            await Task.Delay(2000); 
+            using var scope = _serviceProvider.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<IApplicationDbContext>();
+
+            await CleanupExpiredRefreshTokensAsync(db, cancellationToken);
+        }
+
+        private async Task CleanupExpiredRefreshTokensAsync(IApplicationDbContext db, CancellationToken ct)
+        {
+            // Keep revoked tokens for a 7-day buffer so we can still detect reuse attempts shortly after expiry.
+            var cutoff = DateTime.UtcNow.AddDays(-7);
+
+            var deleted = await db.RefreshTokens
+                .Where(t => t.ExpiresAt < cutoff)
+                .ExecuteDeleteAsync(ct);
+
+            if (deleted > 0)
+                _logger.LogInformation("Removed {Count} expired refresh tokens.", deleted);
         }
     }
 }

@@ -22,6 +22,9 @@ namespace Domain.Entities.Visitors
         public bool IsInside { get; set; } = true;
         public DateTime? ExitDateTime { get; set; }
 
+        /// <summary>Display name of the user who registered this visitor.</summary>
+        public string? RegisteredByName { get; set; }
+
         public virtual Vehicle Vehicles { get; set; } = new Vehicle();
     }
 }

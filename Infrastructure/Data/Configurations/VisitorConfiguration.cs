@@ -58,6 +58,10 @@ public class VisitorConfiguration : IEntityTypeConfiguration<Visitor>
                .HasMaxLength(100)
                .HasComment("کاربری که آخرین تغییر را انجام داده است");
 
+        builder.Property(v => v.RegisteredByName)
+               .HasMaxLength(200)
+               .HasComment("نام نمایشی کاربری که این ملاقات‌کننده را ثبت کرد");
+
         // Indexes
         builder.HasIndex(v => v.NationalCode)
                .HasDatabaseName("IX_Visitor_NationalCode");
