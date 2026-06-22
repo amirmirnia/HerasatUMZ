@@ -41,6 +41,8 @@ public class RegisterVisitorCommandHandler : IRequestHandler<RegisterVisitorComm
             NationalCode = request.NationalCode,
             PhoneNumber = request.PhoneNumber,
             HostName = request.HostName,
+            Type = request.Type,
+            Description = request.Description,
             GuidCode = Guid.NewGuid().ToString("N")[..10],
             RegisterDateTime = DateTime.Now,
             IsActive = true,

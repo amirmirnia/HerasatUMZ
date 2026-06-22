@@ -25,6 +25,15 @@ public class VisitorConfiguration : IEntityTypeConfiguration<Visitor>
                .HasMaxLength(100)
                .HasComment("نام ملاقات‌شونده در دانشگاه");
 
+        builder.Property(v => v.Type)
+               .IsRequired()
+               .HasDefaultValue(Domain.Enums.VisitorType.Normal)
+               .HasComment("نوع ارباب رجوع (1 = فرد عادی، 2 = دانشجو)");
+
+        builder.Property(v => v.Description)
+               .HasMaxLength(1000)
+               .HasComment("توضیحات تکمیلی ارباب رجوع");
+
         builder.Property(v => v.RegisterDateTime)
                .IsRequired()
                .HasComment("تاریخ و زمان ورود به دانشگاه");

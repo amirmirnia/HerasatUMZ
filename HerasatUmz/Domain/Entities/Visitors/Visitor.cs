@@ -1,5 +1,6 @@
 ﻿using Domain.Common;
 using Domain.Entities.Vehicles;
+using Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -15,6 +16,13 @@ namespace Domain.Entities.Visitors
         public string FullName { get; set; } = string.Empty;
         public string NationalCode { get; set; } = string.Empty;
         public string HostName { get; set; } = string.Empty;
+
+        /// <summary>نوع ارباب رجوع (فرد عادی، دانشجو و ...)</summary>
+        public VisitorType Type { get; set; } = VisitorType.Normal;
+
+        /// <summary>توضیحات تکمیلی که کاربر/ادمین هنگام ثبت وارد می‌کند.</summary>
+        public string? Description { get; set; }
+
         public DateTime RegisterDateTime { get; set; } = DateTime.Now;
         public string GuidCode { get; set; } = Guid.NewGuid().ToString("N")[..10]; // 10 رقمی تصادفی
         public string? PhoneNumber { get; set; }

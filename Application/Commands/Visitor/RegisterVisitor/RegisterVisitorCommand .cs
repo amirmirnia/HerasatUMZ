@@ -14,6 +14,13 @@ namespace Application.Commands.Visitor.RegisterVisitor
         public string FullName { get; set; } = string.Empty;
         public string NationalCode { get; set; } = string.Empty;
         public string HostName { get; set; } = string.Empty;
+
+        /// <summary>نوع ارباب رجوع (پیش‌فرض: فرد عادی)</summary>
+        public VisitorType Type { get; set; } = VisitorType.Normal;
+
+        /// <summary>توضیحات تکمیلی</summary>
+        public string? Description { get; set; }
+
         public string? PhoneNumber { get; set; }
         public string? PhotoBase64 { get; set; }
 

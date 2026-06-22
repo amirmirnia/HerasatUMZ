@@ -1,4 +1,5 @@
 ﻿@page "/panel/visitors/ListExitedVisitors"
+@using Domain.Enums
 @attribute [Authorize]
 @layout PanelLayout
 @inherits BaseComponent
@@ -116,6 +117,7 @@
                             <tr>
                                 <th>عکس</th>
                                 <th>نام کامل</th>
+                                <th>نوع</th>
                                 <th>کد ملی</th>
                                 <th>پلاک</th>
                                 <th>ملاقات‌شونده</th>
@@ -137,6 +139,15 @@
                                         style="width:50px;height:50px;object-fit:cover;" />
                                     </td>
                                     <td><strong>@v.FullName</strong></td>
+                                    <td>
+                                        <span class="badge @(v.Type == VisitorType.Student ? "badge-info" : "badge-secondary")">
+                                            @v.Type.GetDescription()
+                                        </span>
+                                        @if (!string.IsNullOrWhiteSpace(v.Description))
+                                        {
+                                            <i class="fas fa-info-circle text-muted ml-1" title="@v.Description"></i>
+                                        }
+                                    </td>
                                     <td>@v.NationalCode</td>
                                     <td>
                                         @{

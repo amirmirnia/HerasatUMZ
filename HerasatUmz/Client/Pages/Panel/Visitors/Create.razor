@@ -71,6 +71,24 @@
                     </div>
                 </div>
 
+                <!-- نوع ارباب رجوع -->
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>نوع ارباب رجوع <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fas fa-user-tag"></i></span>
+                            </div>
+                            <InputSelect @bind-Value="visitor.Type" class="form-control">
+                                @foreach (var type in Enum.GetValues(typeof(VisitorType)).Cast<VisitorType>())
+                                {
+                                    <option value="@type">@type.GetDescription()</option>
+                                }
+                            </InputSelect>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- شماره همراه -->
                 <div class="col-md-6">
                     <div class="form-group">
@@ -114,6 +132,17 @@
                             </div>
                         </div>
                     }
+                </div>
+            </div>
+
+            <!-- توضیحات -->
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label><i class="fas fa-comment-dots"></i> توضیحات</label>
+                        <InputTextArea @bind-Value="visitor.Description" class="form-control" rows="3"
+                                       placeholder="توضیحات تکمیلی درباره ارباب رجوع (اختیاری)" />
+                    </div>
                 </div>
             </div>
 
