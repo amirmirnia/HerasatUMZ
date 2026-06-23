@@ -41,7 +41,7 @@
                                     <span class="input-group-text"><i class="fas fa-search"></i></span>
                                 </div>
                                 <input type="text" class="form-control" placeholder="نام، کد ملی یا ملاقات‌شونده..."
-                                @bind="searchQuery" @bind:event="oninput" @bind:after="LoadVisitors" />
+                                       @bind="searchQuery" @bind:event="oninput" @bind:after="LoadVisitors" />
                             </div>
                         </div>
                     </div>
@@ -54,14 +54,14 @@
                                     <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
                                 </div>
                                 <input id="checkIn"
-                                type="text"
-                                class="form-control"
-                                data-jdp
-                                data-jdp-miladi-input="miladi_dateS"
-                                placeholder="انتخاب تاریخ ورود"
-                                autocomplete="off"
-                                value="@DateTime.Now.ToPeString("yyyy/MM/dd")"
-                                @onchange="UpdateCheckInDate" />
+                                       type="text"
+                                       class="form-control"
+                                       data-jdp
+                                       data-jdp-miladi-input="miladi_dateS"
+                                       placeholder="انتخاب تاریخ ورود"
+                                       autocomplete="off"
+                                       value="@DateTime.Now.ToPeString("yyyy/MM/dd")"
+                                       @onchange="UpdateCheckInDate" />
                                 <input id="miladi_dateS" type="hidden" @bind="MiladiCheckIn" />
                             </div>
                         </div>
@@ -75,13 +75,13 @@
                                     <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
                                 </div>
                                 <input id="checkOut"
-                                type="text"
-                                class="form-control"
-                                data-jdp
-                                data-jdp-miladi-input="miladi_dateE"
-                                placeholder="شمسی"
-                                autocomplete="off"
-                                @onchange="UpdateCheckOutDate" />
+                                       type="text"
+                                       class="form-control"
+                                       data-jdp
+                                       data-jdp-miladi-input="miladi_dateE"
+                                       placeholder="شمسی"
+                                       autocomplete="off"
+                                       @onchange="UpdateCheckOutDate" />
                                 <input id="miladi_dateE" type="hidden" @bind="MiladiCheckOut" />
                             </div>
                         </div>
@@ -135,9 +135,9 @@
                                 <tr>
                                     <td>
                                         <img src="@GetVisitorImage(v.PhotoPath)"
-                                        class="img-circle elevation-2"
-                                        alt="@v.FullName"
-                                        style="width:50px;height:50px;object-fit:cover;" />
+                                             class="img-circle elevation-2"
+                                             alt="@v.FullName"
+                                             style="width:50px;height:50px;object-fit:cover;" />
                                     </td>
                                     <td><strong>@v.FullName</strong></td>
                                     <td>
@@ -154,9 +154,9 @@
                                                     <i class="fas fa-car text-primary"></i>
                                                     <span class="tooltiptext">
                                                         <Plate Part1="@v.Vehicles.PlatePart1"
-                                                        Letter="@v.Vehicles.PlateLetter.GetDescription()"
-                                                        Part3="@v.Vehicles.PlatePart3"
-                                                        Part4="@v.Vehicles.PlatePart4" />
+                                                               Letter="@v.Vehicles.PlateLetter.GetDescription()"
+                                                               Part3="@v.Vehicles.PlatePart3"
+                                                               Part4="@v.Vehicles.PlatePart4" />
                                                     </span>
                                                 </div>
                                             }
@@ -181,11 +181,17 @@
                                         }
                                     </td>
                                     <td>
-                                        <button class="btn btn-secondary btn-sm"
-                                                @onclick="() => ShowDescription(v.FullName, v.Description)"
-                                                title="مشاهده توضیحات">
-                                            <i class="fas fa-comment-dots"></i> توضیحات
-                                        </button>
+                                        @{
+                                            if (!string.IsNullOrEmpty(v.Description))
+                                            {
+                                                <button class="btn btn-primary  btn-sm"
+                                                        @onclick="() => ShowDescription(v.FullName, v.Description)"
+                                                        title="مشاهده توضیحات">
+                                                    <i class="fas fa-comment-dots"></i> توضیحات
+                                                </button>
+                                            }
+                                        }
+
                                         @{
                                             if (!string.IsNullOrEmpty(v.Vehicles.PlatePart1))
                                             {
