@@ -7,6 +7,7 @@
 <PageTitle>ملاقات‌کنندگان خارج شده</PageTitle>
 
 <ImageModal @ref="imageModal" OnClose="() => StateHasChanged()" />
+<DescriptionModal @ref="descModal" />
 
 
 <section class="content-header">
@@ -143,10 +144,6 @@
                                         <span class="badge @(v.Type == VisitorType.Student ? "badge-info" : "badge-secondary")">
                                             @v.Type.GetDescription()
                                         </span>
-                                        @if (!string.IsNullOrWhiteSpace(v.Description))
-                                        {
-                                            <i class="fas fa-info-circle text-muted ml-1" title="@v.Description"></i>
-                                        }
                                     </td>
                                     <td>@v.NationalCode</td>
                                     <td>
@@ -184,10 +181,15 @@
                                         }
                                     </td>
                                     <td>
+                                        <button class="btn btn-secondary btn-sm"
+                                                @onclick="() => ShowDescription(v.FullName, v.Description)"
+                                                title="مشاهده توضیحات">
+                                            <i class="fas fa-comment-dots"></i> توضیحات
+                                        </button>
                                         @{
                                             if (!string.IsNullOrEmpty(v.Vehicles.PlatePart1))
                                             {
-                                                <button class="btn btn-info btn-sm"
+                                                <button class="btn btn-info btn-sm ml-1"
                                                         @onclick="() => ShowVehicleImage(v.Vehicles.VehiclePhotoPath)"
                                                         title="نمایش عکس ماشین">
                                                     <i class="fas fa-image"></i> ماشین
@@ -225,7 +227,6 @@
                         </nav>
                     }
                 }
-                }
             </div>
         </div>
     </div>
@@ -238,6 +239,7 @@
     private int pendingVisitorId;
     private string pendingVisitorName = "";
     private ImageModal? imageModal;
+    private DescriptionModal? descModal;
     private string searchQuery = "";
     private string MiladiCheckIn = DateTime.Now.ToString();
     private string MiladiCheckOut = "";
@@ -415,6 +417,11 @@
             : null;
 
         imageModal?.Show(url);
+    }
+
+    private void ShowDescription(string fullName, string? description)
+    {
+        descModal?.Show(fullName, description);
     }
     private async Task GoToPage(int page)
     {
