@@ -13,9 +13,7 @@ namespace Application.Commands.Visitors.RegisterVisitor
                 .MinimumLength(2).WithMessage("نام باید حداقل ۲ کاراکتر باشد.");
 
             RuleFor(x => x.NationalCode)
-                .NotEmpty().WithMessage("کد ملی الزامی است.")
-                .Length(10).WithMessage("کد ملی باید دقیقاً ۱۰ رقم باشد.")
-                .Matches(@"^\d{10}$").WithMessage("کد ملی باید فقط شامل اعداد باشد.");
+                .NotEmpty().WithMessage("کد ملی الزامی است.");
 
             RuleFor(x => x.HostName)
                 .NotEmpty().WithMessage("نام میزبان الزامی است.")

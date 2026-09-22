@@ -19,11 +19,7 @@ namespace Application.Commands.Visitor.RegisterVisitor
 
             RuleFor(x => x.NationalCode)
                 .NotEmpty()
-                .WithMessage("کد ملی الزامی است.")
-                .Length(10)
-                .WithMessage("کد ملی باید دقیقاً ۱۰ رقم باشد.")
-                .Matches(@"^\d{10}$")
-                .WithMessage("کد ملی فقط شامل اعداد است.");
+                .WithMessage("کد ملی الزامی است.");
 
 
             RuleFor(x => x.HostName)
