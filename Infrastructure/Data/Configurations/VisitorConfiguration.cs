@@ -17,7 +17,7 @@ public class VisitorConfiguration : IEntityTypeConfiguration<Visitor>
 
         builder.Property(v => v.NationalCode)
                .IsRequired()
-               .HasMaxLength(10)
+               .HasColumnType("nvarchar(max)")
                .HasComment("کد ملی ملاقات‌کننده");
 
         builder.Property(v => v.HostName)
@@ -72,9 +72,6 @@ public class VisitorConfiguration : IEntityTypeConfiguration<Visitor>
                .HasComment("نام نمایشی کاربری که این ملاقات‌کننده را ثبت کرد");
 
         // Indexes
-        builder.HasIndex(v => v.NationalCode)
-               .HasDatabaseName("IX_Visitor_NationalCode");
-
         builder.HasIndex(v => v.GuidCode)
                .IsUnique()
                .HasDatabaseName("IX_Visitor_GuidCode");
