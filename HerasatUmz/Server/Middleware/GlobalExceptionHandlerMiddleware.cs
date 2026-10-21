@@ -65,6 +65,17 @@ namespace Server.Middleware
             context.Response.StatusCode = status;
             context.Response.ContentType = "application/json; charset=utf-8";
 
+            if (ex is MeetingRequestLimitException limit)
+            {
+                context.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+                await context.Response.WriteAsJsonAsync(new
+                {
+                    success = false,
+                    message = limit.Message
+                });
+                return;
+            }
+
             await context.Response.WriteAsync(JsonSerializer.Serialize(error, JsonOptions));
         }
 
@@ -72,6 +83,12 @@ namespace Server.Middleware
         {
             switch (ex)
             {
+                case MeetingRequestLimitException limit:
+                    return (StatusCodes.Status429TooManyRequests, new ApiError
+                    {
+                        Code = "meeting_request_limit",
+                        Message = limit.Message
+                    });
                 case ValidationException ve:
                     return ((int)HttpStatusCode.BadRequest, new ApiError
                     {
