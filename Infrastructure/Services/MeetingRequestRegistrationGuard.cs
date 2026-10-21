@@ -9,9 +9,9 @@ namespace Infrastructure.Services;
 public class MeetingRequestRegistrationGuard(ApplicationDbContext context)
     : IMeetingRequestRegistrationGuard
 {
-    public async Task<int> ExecuteAsync(
+    public async Task<T> ExecuteAsync<T>(
         string hostNationalCode,
-        Func<Task<int>> register,
+        Func<Task<T>> register,
         CancellationToken cancellationToken)
     {
         // A transaction-owned SQL Server lock also protects against requests on other instances.

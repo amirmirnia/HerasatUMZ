@@ -15,15 +15,40 @@ public class RegisterVisitorCommandHandler : IRequestHandler<RegisterVisitorComm
     private readonly IApplicationDbContext _context;
     private readonly IMapper _mapper;
     private readonly ICurrentUserService _currentUser;
-    public RegisterVisitorCommandHandler(IApplicationDbContext context, IMapper mapper, ICurrentUserService currentUser)
+    private readonly IMeetingRequestRegistrationGuard _guard;
+    public RegisterVisitorCommandHandler(IApplicationDbContext context, IMapper mapper, ICurrentUserService currentUser,
+        IMeetingRequestRegistrationGuard guard)
     {
         _context = context;
         _mapper = mapper;
         _currentUser = currentUser;
+        _guard = guard;
     }
 
     public async Task<VisitorVM> Handle(RegisterVisitorCommand request, CancellationToken cancellationToken)
     {
+        if (request.MeetingRequestId is int id)
+        {
+            return await _guard.ExecuteAsync($"entry:{id}",
+                () => RegisterAsync(request, cancellationToken), cancellationToken);
+        }
+
+        return await RegisterAsync(request, cancellationToken);
+    }
+
+    private async Task<VisitorVM> RegisterAsync(RegisterVisitorCommand request, CancellationToken cancellationToken)
+    {
+        Domain.Entities.Meetings.MeetingRequest? meeting = null;
+        if (request.MeetingRequestId is int meetingId)
+        {
+            meeting = await _context.MeetingRequests.FirstOrDefaultAsync(
+                x => x.Id == meetingId && x.IsActive, cancellationToken)
+                ?? throw new NotFoundException("درخواست ملاقات یافت نشد.");
+
+            if (meeting.Status == "Entered")
+                throw new InvalidOperationException("ورود این درخواست قبلاً ثبت شده است.");
+        }
+
         // بررسی وجود بازدیدکننده داخل سازمان
         var exists = await _context.Visitors.Include(x=>x.Vehicles)
             .FirstOrDefaultAsync(v => ((v.NationalCode == request.NationalCode)
@@ -59,6 +84,8 @@ public class RegisterVisitorCommandHandler : IRequestHandler<RegisterVisitorComm
         }
 
         _context.Visitors.Add(visitor);
+        if (meeting != null)
+            meeting.Status = "Entered";
         await _context.SaveChangesAsync(cancellationToken);
 
 

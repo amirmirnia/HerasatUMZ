@@ -58,8 +58,15 @@
                                         <td>@item.HostNationalCode</td><td>@PersianDate(item.RequestedDate.ToDateTime(TimeOnly.MinValue))</td>
                                         <td>@RegisteredAt(item.CreatedDate)</td><td>@StatusText(item.Status)</td>
                                         <td>
-                                            <NavLink href="@($"/panel/visitors/create?meetingRequestId={item.Id}")"
-                                                     class="btn btn-primary btn-sm">ثبت ورود</NavLink>
+                                            @if (item.Status == "Entered")
+                                            {
+                                                <button type="button" class="btn btn-success btn-sm" disabled>ورود شد</button>
+                                            }
+                                            else
+                                            {
+                                                <NavLink href="@($"/panel/visitors/create?meetingRequestId={item.Id}")"
+                                                         class="btn btn-primary btn-sm">ثبت ورود</NavLink>
+                                            }
                                         </td>
                                     </tr>
                                 }
@@ -137,6 +144,7 @@
         "Pending" => "در انتظار بررسی",
         "Approved" => "تأییدشده",
         "Rejected" => "ردشده",
+        "Entered" => "ورود شد",
         _ => status
     };
 }

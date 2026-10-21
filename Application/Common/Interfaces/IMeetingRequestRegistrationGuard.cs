@@ -2,8 +2,8 @@ namespace Application.Common.Interfaces;
 
 public interface IMeetingRequestRegistrationGuard
 {
-    Task<int> ExecuteAsync(
+    Task<T> ExecuteAsync<T>(
         string hostNationalCode,
-        Func<Task<int>> register,
+        Func<Task<T>> register,
         CancellationToken cancellationToken);
 }

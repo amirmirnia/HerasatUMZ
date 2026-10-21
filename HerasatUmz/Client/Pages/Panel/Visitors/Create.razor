@@ -330,6 +330,7 @@
 
     private async Task LoadMeetingRequestAsync()
     {
+        visitor.MeetingRequestId = null;
         meetingRequest = null;
         requestError = null;
         loadedRequestId = null;
@@ -352,6 +353,13 @@
                 return;
             }
 
+            if (meetingRequest.Status == "Entered")
+            {
+                requestError = "ورود این درخواست قبلاً ثبت شده است.";
+                return;
+            }
+
+            visitor.MeetingRequestId = meetingRequest.Id;
             visitor.FullName = meetingRequest.VisitorFullName;
             visitor.HostName = meetingRequest.HostFullName;
             loadedRequestId = id;
@@ -420,7 +428,10 @@
             var response = await Http.PostAsJsonAsync("api/visitors/register", visitor);
             if (response.IsSuccessStatusCode)
             {
-                Navigation.NavigateTo("/panel/visitors?toastMessage=ملاقات کننده با موفقیت ایجاد شد&toastType=Success");
+                if (visitor.MeetingRequestId.HasValue)
+                    Navigation.NavigateTo("/panel/meeting-requests");
+                else
+                    Navigation.NavigateTo("/panel/visitors?toastMessage=ملاقات کننده با موفقیت ایجاد شد&toastType=Success");
             }
             else
             {
