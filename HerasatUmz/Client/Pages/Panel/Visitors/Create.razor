@@ -1,5 +1,6 @@
 ﻿@page "/panel/visitors/create"
 @using Domain.Enums
+@using Application.DTOs.Meetings
 @attribute [Authorize]
 @layout PanelLayout
 @inherits BaseComponent
@@ -25,6 +26,25 @@
         </h3>
     </div>
     <div class="card-body">
+        @if (loadingRequest)
+        {
+            <p role="status">در حال دریافت اطلاعات درخواست...</p>
+        }
+        else if (requestError != null)
+        {
+            <div class="alert alert-danger" role="alert">@requestError</div>
+            <button type="button" class="btn btn-outline-primary mb-3" @onclick="LoadMeetingRequestAsync">تلاش مجدد</button>
+        }
+        else if (meetingRequest != null)
+        {
+            <div class="meeting-request-notice" role="note" dir="rtl">
+                <div>درخواست شماره: @meetingRequest.Id</div>
+                <div>ملاقات‌شونده: @meetingRequest.HostFullName</div>
+                <div>کد ملی ملاقات‌شونده: @meetingRequest.HostNationalCode</div>
+                <div>تاریخ ملاقات: @MeetingDate(meetingRequest.RequestedDate)</div>
+                <div>کد ملی مراجعه‌کننده و باقی اطلاعات را از خود شخص دریافت کنید.</div>
+            </div>
+        }
         <EditForm Model="visitor" OnValidSubmit="HandleSubmit">
             <DataAnnotationsValidator />
             <ValidationSummary class="text-danger" />
@@ -277,7 +297,7 @@
                 <button type="button" class="btn btn-outline-secondary btn-lg" @onclick='() => Navigation.NavigateTo("/panel/visitors")'>
                     <i class="fas fa-arrow-left"></i> انصراف
                 </button>
-                <button type="submit" class="btn btn-primary btn-lg ml-2" disabled="@isSubmitting">
+                <button type="submit" class="btn btn-primary btn-lg ml-2" disabled="@(isSubmitting || loadingRequest || requestError != null)">
                     @if (isSubmitting)
                     {
                         <i class="fas fa-spinner fa-spin"></i>
@@ -293,6 +313,63 @@
 </div>
 
 @code {
+    [SupplyParameterFromQuery(Name = "meetingRequestId")]
+    public int? MeetingRequestId { get; set; }
+
+    private MeetingRequestListDto? meetingRequest;
+    private int? loadedRequestId;
+    private string? requestError;
+    private bool loadingRequest;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+        if (MeetingRequestId == loadedRequestId) return;
+        await LoadMeetingRequestAsync();
+    }
+
+    private async Task LoadMeetingRequestAsync()
+    {
+        meetingRequest = null;
+        requestError = null;
+        loadedRequestId = null;
+        if (MeetingRequestId is not int id) return;
+
+        loadingRequest = true;
+        try
+        {
+            using var response = await Http.GetAsync($"api/panel/meeting-requests/{id}");
+            if (!response.IsSuccessStatusCode)
+            {
+                requestError = await ApiErrorReader.ReadMessageAsync(response);
+                return;
+            }
+
+            meetingRequest = await response.Content.ReadFromJsonAsync<MeetingRequestListDto>();
+            if (meetingRequest == null)
+            {
+                requestError = "درخواست ملاقات یافت نشد.";
+                return;
+            }
+
+            visitor.FullName = meetingRequest.VisitorFullName;
+            visitor.HostName = meetingRequest.HostFullName;
+            loadedRequestId = id;
+        }
+        catch (Exception)
+        {
+            requestError = "دریافت اطلاعات درخواست ملاقات امکان‌پذیر نیست.";
+        }
+        finally { loadingRequest = false; }
+    }
+
+    private static string MeetingDate(DateOnly date)
+    {
+        var calendar = new PersianCalendar();
+        var value = date.ToDateTime(TimeOnly.MinValue);
+        return $"{calendar.GetYear(value):0000}/{calendar.GetMonth(value):00}/{calendar.GetDayOfMonth(value):00}";
+    }
+
     private VisitorDto visitor = new();
     private string? previewImage;
     private string? previewVehicleImage;
@@ -317,6 +394,8 @@
 
     private async Task HandleSubmit(EditContext context)
     {
+        if (isSubmitting || loadingRequest || requestError != null) return;
+
         // اعتبارسنجی شرطی برای ماشین
         if (visitor.HasVehicle)
         {

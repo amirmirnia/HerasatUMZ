@@ -48,7 +48,7 @@
                             <thead><tr>
                                 <th scope="col">شناسه</th><th scope="col">مراجعه‌کننده</th>
                                 <th scope="col">ملاقات‌شونده</th><th scope="col">کد ملی ملاقات‌شونده</th>
-                                <th scope="col">تاریخ ملاقات</th><th scope="col">زمان ثبت (تهران)</th><th scope="col">وضعیت</th>
+                                <th scope="col">تاریخ ملاقات</th><th scope="col">زمان ثبت (تهران)</th><th scope="col">وضعیت</th><th scope="col">عملیات</th>
                             </tr></thead>
                             <tbody>
                                 @foreach (var item in result.Items)
@@ -57,6 +57,10 @@
                                         <td>@item.Id</td><td>@item.VisitorFullName</td><td>@item.HostFullName</td>
                                         <td>@item.HostNationalCode</td><td>@PersianDate(item.RequestedDate.ToDateTime(TimeOnly.MinValue))</td>
                                         <td>@RegisteredAt(item.CreatedDate)</td><td>@StatusText(item.Status)</td>
+                                        <td>
+                                            <NavLink href="@($"/panel/visitors/create?meetingRequestId={item.Id}")"
+                                                     class="btn btn-primary btn-sm">ثبت ورود</NavLink>
+                                        </td>
                                     </tr>
                                 }
                             </tbody>
