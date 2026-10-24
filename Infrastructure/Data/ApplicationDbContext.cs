@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Domain.Entities.Meetings;
 using Application.Common.Interfaces;
 
 using Domain.Entities.Users;
@@ -21,6 +22,7 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
     }
 
     public DbSet<User> Users => Set<User>();
+    public DbSet<MeetingRequest> MeetingRequests => Set<MeetingRequest>();
     public DbSet<VisitLog> visitLogs => Set<VisitLog>();
 
     public DbSet<Visitor> Visitors => Set<Visitor>();

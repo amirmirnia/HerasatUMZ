@@ -1,0 +1,150 @@
+@page "/panel/meeting-requests"
+@attribute [Authorize]
+@layout PanelLayout
+@using Application.DTOs.Meetings
+@inject HttpClient Http
+
+<PageTitle>درخواست‌های ملاقات</PageTitle>
+
+<section class="content-header" dir="rtl">
+    <div class="container-fluid"><h1>درخواست‌های ملاقات</h1></div>
+</section>
+<section class="content" dir="rtl">
+    <div class="container-fluid">
+        <div class="card card-primary card-outline">
+            <div class="card-header">
+                <h3 class="card-title">فهرست درخواست‌های ثبت‌شده</h3>
+            </div>
+            <div class="card-body">
+                <form @onsubmit="SearchAsync" @onsubmit:preventDefault>
+                    <label for="meeting-search">جستجو بر اساس نام یا کد ملی ملاقات‌شونده</label>
+                    <div class="input-group mb-3">
+                        <input id="meeting-search" class="form-control" @bind="search" placeholder="نام مراجعه‌کننده، ملاقات‌شونده یا کد ملی" disabled="@loading" />
+                        <div class="input-group-append">
+                            <button class="btn btn-primary" type="submit" disabled="@loading">جستجو</button>
+                            <button class="btn btn-outline-secondary" type="button" @onclick="ClearAsync" disabled="@loading">پاک کردن</button>
+                        </div>
+                    </div>
+                </form>
+
+                @if (loading)
+                {
+                    <p role="status">در حال دریافت درخواست‌ها...</p>
+                }
+                else if (error != null)
+                {
+                    <div class="alert alert-danger" role="alert">@error</div>
+                    <button class="btn btn-outline-primary" @onclick="LoadAsync">تلاش مجدد</button>
+                }
+                else if (result.Items.Count == 0)
+                {
+                    <div class="alert alert-info">درخواستی برای نمایش وجود ندارد.</div>
+                }
+                else
+                {
+                    <p>تعداد کل: @result.TotalCount</p>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <thead><tr>
+                                <th scope="col">شناسه</th><th scope="col">مراجعه‌کننده</th>
+                                <th scope="col">ملاقات‌شونده</th><th scope="col">کد ملی ملاقات‌شونده</th>
+                                <th scope="col">تاریخ ملاقات</th><th scope="col">زمان ثبت (تهران)</th><th scope="col">وضعیت</th><th scope="col">عملیات</th>
+                            </tr></thead>
+                            <tbody>
+                                @foreach (var item in result.Items)
+                                {
+                                    <tr @key="item.Id">
+                                        <td>@item.Id</td><td>@item.VisitorFullName</td><td>@item.HostFullName</td>
+                                        <td>@item.HostNationalCode</td><td>@PersianDate(item.RequestedDate.ToDateTime(TimeOnly.MinValue))</td>
+                                        <td>@RegisteredAt(item.CreatedDate)</td><td>@StatusText(item.Status)</td>
+                                        <td>
+                                            @if (item.Status == "Entered")
+                                            {
+                                                <button type="button" class="btn btn-success btn-sm" disabled>ورود شد</button>
+                                            }
+                                            else
+                                            {
+                                                <NavLink href="@($"/panel/visitors/create?meetingRequestId={item.Id}")"
+                                                         class="btn btn-primary btn-sm">ثبت ورود</NavLink>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <nav class="d-flex align-items-center justify-content-between" aria-label="صفحه‌بندی درخواست‌های ملاقات">
+                        <button class="btn btn-outline-primary" disabled="@(result.PageNumber <= 1)" @onclick="PreviousAsync">قبلی</button>
+                        <span>صفحه @result.PageNumber از @result.TotalPages</span>
+                        <button class="btn btn-outline-primary" disabled="@(result.PageNumber >= result.TotalPages)" @onclick="NextAsync">بعدی</button>
+                    </nav>
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+@code {
+    private MeetingRequestPageDto result = new();
+    private string search = "";
+    private string appliedSearch = "";
+    private string? error;
+    private bool loading;
+    private int pageNumber = 1;
+
+    protected override Task OnInitializedAsync() => LoadAsync();
+
+    private async Task LoadAsync()
+    {
+        if (loading) return;
+        loading = true;
+        error = null;
+        try
+        {
+            var url = $"api/panel/meeting-requests?pageNumber={pageNumber}&search={Uri.EscapeDataString(appliedSearch)}";
+            using var response = await Http.GetAsync(url);
+            if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+                error = "شما مجوز مشاهده درخواست‌های ملاقات را ندارید.";
+            else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                error = "برای مشاهده درخواست‌ها مجدداً وارد حساب خود شوید.";
+            else
+            {
+                response.EnsureSuccessStatusCode();
+                result = await response.Content.ReadFromJsonAsync<MeetingRequestPageDto>()
+                    ?? throw new InvalidOperationException("Empty response");
+                pageNumber = result.PageNumber;
+            }
+        }
+        catch (Exception)
+        {
+            error = "دریافت درخواست‌های ملاقات با مشکل مواجه شد. دوباره تلاش کنید.";
+        }
+        finally { loading = false; }
+    }
+
+    private Task SearchAsync() { appliedSearch = search.Trim(); pageNumber = 1; return LoadAsync(); }
+    private Task ClearAsync() { search = ""; return SearchAsync(); }
+    private Task PreviousAsync() { pageNumber--; return LoadAsync(); }
+    private Task NextAsync() { pageNumber++; return LoadAsync(); }
+
+    private static string PersianDate(DateTime date)
+    {
+        var calendar = new PersianCalendar();
+        return $"{calendar.GetYear(date):0000}/{calendar.GetMonth(date):00}/{calendar.GetDayOfMonth(date):00}";
+    }
+
+    private static string RegisteredAt(DateTime utc)
+    {
+        var tehran = new DateTimeOffset(DateTime.SpecifyKind(utc, DateTimeKind.Utc)).ToOffset(TimeSpan.FromMinutes(210));
+        return $"{PersianDate(tehran.DateTime)} {tehran:HH:mm}";
+    }
+
+    private static string StatusText(string status) => status switch
+    {
+        "Pending" => "در انتظار بررسی",
+        "Approved" => "تأییدشده",
+        "Rejected" => "ردشده",
+        "Entered" => "ورود شد",
+        _ => status
+    };
+}

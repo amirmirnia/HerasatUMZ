@@ -16,6 +16,9 @@ using Microsoft.Extensions.FileProviders;
 using Infrastructure.Services.BackgroundServices;
 using Server.Hubs;
 using Server.Middleware;
+using Microsoft.AspNetCore.Authentication;
+using Server.Authentication;
+using Application.Common.Options;
 
 // Keep JWT claim names as-issued (sub stays sub, etc.) — the framework default
 // remaps them to long ClaimTypes URIs and breaks token-claim lookups.
@@ -42,6 +45,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 // Register Application DbContext Interface
 builder.Services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
+builder.Services.AddScoped<IMeetingRequestRegistrationGuard, MeetingRequestRegistrationGuard>();
+builder.Services.AddOptions<MeetingApiOptions>()
+    .Bind(builder.Configuration.GetSection("MeetingApi"))
+    .Validate(options => options.RequestIntervalMinutes > 0,
+        "MeetingApi:RequestIntervalMinutes must be greater than zero.")
+    .ValidateOnStart();
 
 // Add Current User Service
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
@@ -98,6 +107,10 @@ builder.Services.AddAuthentication(options =>
         }
     };
 });
+
+builder.Services.AddAuthentication()
+    .AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>(
+        ApiKeyAuthenticationHandler.SchemeName, _ => { });
 
 builder.Services.AddAuthorization();
 

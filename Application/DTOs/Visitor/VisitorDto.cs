@@ -10,6 +10,7 @@ namespace Application.DTOs.Visitor
 {
     public class VisitorDto
     {
+        public int? MeetingRequestId { get; set; }
         public string FullName { get; set; } = string.Empty;
         public string NationalCode { get; set; } = string.Empty;
         public string HostName { get; set; } = string.Empty;
